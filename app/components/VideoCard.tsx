@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useRef, useState, useEffect } from 'react';
 
 interface VideoCardProps {
@@ -114,12 +116,12 @@ const VideoCard: React.FC<VideoCardProps> = ({ videoSrc, buttonText, buttonActio
 
       {/* Button Section */}
       <div className="text-center">
-        <button
-          onClick={buttonAction}
-          className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
-        >
-          {buttonText}
-        </button>
+      <button
+  onClick={buttonAction}
+  className="px-4 py-2 border border-[#779ecb] text-[#779ecb] rounded-full hover:bg-[#779ecb] hover:text-white transition-colors"
+>
+  {buttonText}
+</button>
       </div>
     </div>
   );
