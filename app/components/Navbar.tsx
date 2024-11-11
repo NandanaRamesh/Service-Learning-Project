@@ -55,7 +55,7 @@ const Navbar: React.FC = () => {
           daisyUI
         </Link>
       </div>
-      <div className="navbar-center hidden lg:flex">
+      <div className="navbar-center hidden lg:flex relative z-50">
         <ul className="menu menu-horizontal px-1">
           <li><details>
               <summary>Item 1</summary>
