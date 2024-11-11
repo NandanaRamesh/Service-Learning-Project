@@ -26,7 +26,7 @@ const HomePage: React.FC = () => {
         {/* Flex container to arrange cards side by side */}
         <div className="flex space-x-4">
           <VideoCard
-            videoSrc="https://www.w3schools.com/html/movie.mp4" // Add your video URL
+            videoSrc="https://epmrhvlgnzutggisqloi.supabase.co/storage/v1/object/public/Video%20Collection/Prototype%20Video.mp4?t=2024-11-11T10%3A09%3A54.325Z.mp4" // Add your video URL
             buttonText="Learn More"
             buttonAction={handleButtonClick}
             videoId="video1" // Unique video ID for identification

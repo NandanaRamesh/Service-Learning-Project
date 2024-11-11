@@ -14,13 +14,14 @@ const VideoPlayerContainer: React.FC = () => {
   return (
     <div className="flex flex-wrap space-x-4">
       <VideoCard
-        videoSrc="video1.mp4"
+        key={'https://epmrhvlgnzutggisqloi.supabase.co/storage/v1/object/public/Video%20Collection/Prototype%20Video.mp4?t=2024-11-11T10%3A09%3A54.325Z'}  // This will force React to treat each video as a unique component
+        videoSrc="https://epmrhvlgnzutggisqloi.supabase.co/storage/v1/object/public/Video%20Collection/Prototype%20Video.mp4?t=2024-11-11T10%3A09%3A54.325Z"
         buttonText="Action 1"
         buttonAction={() => alert('Video 1 Action')}
         videoId="video1"
         onPlay={handlePlayVideo}
         isPlaying={currentPlaying === 'video1'}
-      />
+/>
       <VideoCard
         videoSrc="https://epmrhvlgnzutggisqloi.supabase.co/storage/v1/object/public/Video%20Collection/Prototype%20Video.mp4?t=2024-11-11T10%3A09%3A54.325Z.mp4"
         buttonText="Action 2"
