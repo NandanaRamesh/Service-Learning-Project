@@ -1,8 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import Navbar from './components/Navbar';
-import VideoCard from './components/VideoCard'; // Import VideoCard
+import VideoCard from "./components/VideoCard"; // Import VideoCard
 
 const HomePage: React.FC = () => {
   // State to track the currently playing video
@@ -21,13 +20,12 @@ const HomePage: React.FC = () => {
 
   return (
     <div>
-      <Navbar />
       <main className="flex justify-center items-center p-4">
         {/* Flex container to arrange cards side by side */}
         <div className="flex space-x-4">
           <VideoCard
             videoSrc="https://www.w3schools.com/html/movie.mp4" // Add your video URL
-            buttonText="Learn More"
+            buttonText="Watch Videos"
             buttonAction={handleButtonClick}
             videoId="video1" // Unique video ID for identification
             onPlay={handlePlayVideo}
@@ -35,7 +33,7 @@ const HomePage: React.FC = () => {
           />
           <VideoCard
             videoSrc="https://www.w3schools.com/html/movie.mp4" // Add your video URL
-            buttonText="Learn More"
+            buttonText="Join Discussions"
             buttonAction={handleButtonClick}
             videoId="video2" // Unique video ID for identification
             onPlay={handlePlayVideo}
