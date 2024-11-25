@@ -1,32 +1,37 @@
 "use client";
 
 import React, { useState } from "react";
+import { useRouter } from "next/navigation"; // Import useRouter from Next.js
 import VideoCard from "./components/VideoCard"; // Import VideoCard
 
 const HomePage: React.FC = () => {
-  // State to track the currently playing video
   const [currentPlaying, setCurrentPlaying] = useState<string | null>(null);
+  const router = useRouter(); // Initialize useRouter for navigation
 
-  // Handle the video play/pause logic
   const handlePlayVideo = (videoId: string) => {
-    // If the clicked video is already playing, toggle it
     setCurrentPlaying((prev) => (prev === videoId ? null : videoId));
   };
 
-  const handleButtonClick = () => {
-    console.log("Button was clicked!");
-    // Your custom button action logic
+  // Redirect to /Pages/Videos
+  const handleWatchVideosClick = () => {
+    router.push("Pages/Videos");
+  };
+
+  // Example button action for "Join Discussions"
+  const handleJoinDiscussionsClick = () => {
+    console.log("Navigating to discussions...");
+    // You can add a redirection here, e.g., router.push("/Pages/Discussions");
   };
 
   return (
     <div>
-      <main className="flex justify-center items-center p-4">
+      <main className="flex justify-center items-center p-4 bg-gray-900">
         {/* Flex container to arrange cards side by side */}
         <div className="flex space-x-4">
           <VideoCard
             videoSrc="https://www.w3schools.com/html/movie.mp4" // Add your video URL
             buttonText="Watch Videos"
-            buttonAction={handleButtonClick}
+            buttonAction={handleWatchVideosClick} // Redirect to /Pages/Videos
             videoId="video1" // Unique video ID for identification
             onPlay={handlePlayVideo}
             isPlaying={currentPlaying === "video1"}
@@ -34,7 +39,7 @@ const HomePage: React.FC = () => {
           <VideoCard
             videoSrc="https://www.w3schools.com/html/movie.mp4" // Add your video URL
             buttonText="Join Discussions"
-            buttonAction={handleButtonClick}
+            buttonAction={handleJoinDiscussionsClick} // Placeholder for discussions
             videoId="video2" // Unique video ID for identification
             onPlay={handlePlayVideo}
             isPlaying={currentPlaying === "video2"}

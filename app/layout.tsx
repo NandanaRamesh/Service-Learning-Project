@@ -27,10 +27,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className="min-h-screen flex flex-col antialiased">
+      <body className="min-h-screen flex flex-col antialiased bg-gray-900">
         {/* Navbar with ThemeSwitch */}
         <Navbar />
-        <main className="flex-grow">{children}</main>
+        <main className="flex-grow bg-gray-900">{children}</main>
         {/* Footer */}
         <Footer />
       </body>
