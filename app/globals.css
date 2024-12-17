@@ -25,7 +25,7 @@
 }
 
 body {
-  color: var(--text-color);
+  color: inherit;
   background-color: var(--background);
   transition: background-color 0.3s, color 0.3s; /* Smooth transition */
 }

@@ -30,7 +30,7 @@ export default function RootLayout({
       <body className="min-h-screen flex flex-col antialiased bg-inherit">
         {/* Navbar with ThemeSwitch */}
         <Navbar />
-        <main className="flex-grow bg-inherit">{children}</main>
+        <main className="flex-grow bg-inherit color-inherit">{children}</main>
         {/* Footer */}
         <Footer />
       </body>
