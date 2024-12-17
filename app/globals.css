@@ -9,6 +9,7 @@
   --secondary-color: #374151; /* Tailwind's gray-700 */
   --text-color: #000000; /* Default text color for light mode */
   --divider-color: #e5e7eb; /* Light mode divider */
+  --cardbgcolor: #f3f4f6; /* Light mode card background */
 }
 
 @media (prefers-color-scheme: dark) {
@@ -19,6 +20,7 @@
     --secondary-color: #9ca3af; /* Tailwind's gray-400 */
     --text-color: #ededed; /* Text color for dark mode */
     --divider-color: #4b5563; /* Dark mode divider */
+    --cardbgcolor: #1f2937; /* Dark mode card background */
   }
 }
 
@@ -38,6 +40,19 @@ hr {
   margin: 1rem 0; /* Adjust the spacing as needed */
 }
 
+.card {
+  background-color: inherit;
+  color: var(--text-color);
+  border: 1px solid var(--divider-color);
+  border-radius: 8px;
+  transition: background-color 0.3s, color 0.3s;
+  padding: 1rem; /* Default padding */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+}
+
+.card:hover {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Enhanced shadow on hover */
+}
 
 /* Google Translate Styles */
 #google_translate_element {
