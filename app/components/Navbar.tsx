@@ -152,11 +152,6 @@ const Navbar: React.FC = () => {
               <li>
                 <Link href="/Pages/Subjects?tab=facts">Facts</Link>
               </li>
-              <li>
-                <Link href="/Pages/Subjects?tab=arts-and-crafts">
-                  Art & Crafts
-                </Link>
-              </li>
             </ul>
           </li>
           <li className="group relative">

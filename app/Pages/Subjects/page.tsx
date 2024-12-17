@@ -18,7 +18,6 @@ const SubjectsPage: React.FC = () => {
     { label: "English Grammar", id: "english-grammar" },
     { label: "Science", id: "science" },
     { label: "Facts", id: "facts" },
-    { label: "Art & Crafts", id: "arts-and-crafts" },
   ];
 
   // Combine all videos across subjects and filter by search query
