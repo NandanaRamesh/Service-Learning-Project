@@ -24,9 +24,9 @@ const VideoPage: React.FC = () => {
   const videos = videosData[selectedGrade] || [];
 
   return (
-    <div className="flex min-h-screen bg-gray-900 text-white">
+    <div className="flex min-h-screen bg-inherit text-inherit">
       {/* Sidebar */}
-      <div className="w-1/4 bg-gray-800 p-4">
+      <div className="w-1/4 bg-inherit p-4">
         <h2 className="text-2xl font-bold mb-4 text-center">Grades</h2>
         <ul className="space-y-2">
           {grades.map((grade) => (
@@ -44,7 +44,7 @@ const VideoPage: React.FC = () => {
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 p-6">
+      <div className="flex-1 p-6 bg-inherit">
         <h1 className="text-3xl font-bold mb-6">Videos for {selectedGrade}</h1>
 
         {/* Search Bar */}

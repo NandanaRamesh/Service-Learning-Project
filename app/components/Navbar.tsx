@@ -1,37 +1,48 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import Link from "next/link";
 import ThemeSwitch from "./ThemeSwitch";
 
 const Navbar: React.FC = () => {
+  const [language, setLanguage] = useState("en");
+  const googleTranslateElementRef = useRef<HTMLDivElement | null>(null); // Define the ref
+  const translateElementRef = useRef<any>(null); // Reference to the translate element instance
+
   useEffect(() => {
     const loadGoogleTranslate = () => {
       const script = document.createElement("script");
       script.type = "text/javascript";
       script.src =
         "https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit";
-      document.body.appendChild(script);
+      script.onload = () => {
+        window.googleTranslateElementInit = () => {
+          const translateElement = new window.google.translate.TranslateElement(
+            {
+              pageLanguage: "en", // Default page language
+              includedLanguages: "kn,en", // Supported languages (Kannada and English)
+              layout:
+                window.google.translate.TranslateElement.InlineLayout.SIMPLE,
+              autoDisplay: false, // Don't automatically display the dropdown
+            },
+            googleTranslateElementRef.current // Use the ref here
+          );
 
-      // Define the callback function for Google Translate
-      window.googleTranslateElementInit = () => {
-        new window.google.translate.TranslateElement(
-          {
-            pageLanguage: "en",
-            includedLanguages: "kn,en", // Add any other languages here
-            layout:
-              window.google.translate.TranslateElement.InlineLayout.SIMPLE,
-          },
-          "google_translate_element"
-        );
+          // Store the translate element instance for later use
+          translateElementRef.current = translateElement;
+        };
       };
+
+      document.body.appendChild(script); // Append the script to load it
     };
 
     loadGoogleTranslate();
   }, []);
 
+
   return (
     <div className="navbar bg-base-100 relative z-50">
+      {/* Mobile View */}
       <div className="navbar-start">
         <div className="dropdown">
           <div tabIndex={0} role="button" className="btn btn-ghost lg:hidden">
@@ -40,7 +51,8 @@ const Navbar: React.FC = () => {
               className="h-5 w-5"
               fill="none"
               viewBox="0 0 24 24"
-              stroke="currentColor">
+              stroke="currentColor"
+            >
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -51,7 +63,8 @@ const Navbar: React.FC = () => {
           </div>
           <ul
             tabIndex={0}
-            className="menu menu-sm dropdown-content bg-base-100 rounded-box z-[60] mt-3 w-52 p-2 shadow">
+            className="menu menu-sm dropdown-content bg-base-100 rounded-box z-[60] mt-3 w-52 p-2 shadow"
+          >
             <li>
               <Link href="/">Home</Link>
             </li>
@@ -90,15 +103,39 @@ const Navbar: React.FC = () => {
                 </ul>
               </details>
             </li>
+            <li tabIndex={0}>
+              <details>
+                <summary>Activities</summary>
+                <ul className="p-2">
+                  <li>
+                    <Link href="#">Sample 1</Link>
+                  </li>
+                  <li>
+                    <Link href="#">Sample 2</Link>
+                  </li>
+                  <li>
+                    <Link href="#">Sample 3</Link>
+                  </li>
+                  <li>
+                    <Link href="#">Sample 4</Link>
+                  </li>
+                  <li>
+                    <Link href="#">Sample 5</Link>
+                  </li>
+                </ul>
+              </details>
+            </li>
           </ul>
         </div>
         <Link href="/" className="btn btn-ghost text-xl">
           SVSST
         </Link>
       </div>
+
+      {/* Desktop View */}
       <div className="navbar-center hidden lg:flex">
         <ul className="menu menu-horizontal px-1 space-x-4">
-          <li className="group relative">
+          <li>
             <Link href="/">Home</Link>
           </li>
           <li className="group relative">
@@ -136,15 +173,38 @@ const Navbar: React.FC = () => {
               </li>
             </ul>
           </li>
+          <li className="group relative">
+            <Link href="#">Activities</Link>
+            <ul className="absolute left-0 top-full hidden group-hover:block bg-base-100 p-2 shadow rounded-box z-[100]">
+              <li>
+                <Link href="#">Sample 1</Link>
+              </li>
+              <li>
+                <Link href="#">Sample 2</Link>
+              </li>
+              <li>
+                <Link href="#">Sample 3</Link>
+              </li>
+              <li>
+                <Link href="#">Sample 4</Link>
+              </li>
+              <li>
+                <Link href="#">Sample 5</Link>
+              </li>
+            </ul>
+          </li>
         </ul>
       </div>
-      <div className="navbar-end flex items-center space-x-2">
+
+      {/* Right Side */}
+      <div className="navbar-end flex items-center space-x-4">
         <Link href="/Pages/login" className="btn btn-primary">
           Login
         </Link>
-        <div id="google_translate_element" className="p-2"></div>
         <ThemeSwitch />
       </div>
+      {/* Google Translate Widget */}
+      <div ref={googleTranslateElementRef}></div>
     </div>
   );
 };

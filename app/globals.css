@@ -1,17 +1,115 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-  
-/* Your custom global styles */
+
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  --primary-color: #2563eb; /* Tailwind's blue-500 */
+  --secondary-color: #374151; /* Tailwind's gray-700 */
+  --text-color: #000000; /* Default text color for light mode */
+  --divider-color: #e5e7eb; /* Light mode divider */
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
     --foreground: #ededed;
+    --primary-color: #3b82f6; /* Lighter blue for dark mode */
+    --secondary-color: #9ca3af; /* Tailwind's gray-400 */
+    --text-color: #ededed; /* Text color for dark mode */
+    --divider-color: #4b5563; /* Dark mode divider */
   }
 }
 
+body {
+  color: var(--text-color);
+  background-color: var(--background);
+  transition: background-color 0.3s, color 0.3s; /* Smooth transition */
+}
+
+div {
+  background-color: inherit; /* Ensures it inherits from body */
+  color: inherit;            /* Inherits text color */
+}
+
+hr {
+  border-top: 1px solid var(--divider-color);
+  margin: 1rem 0; /* Adjust the spacing as needed */
+}
+
+
+/* Google Translate Styles */
+#google_translate_element {
+  display: block;
+  width: auto;
+  height: auto;
+  overflow: visible;
+  color: var(--text-color) !important; 
+}
+
+/* Main Google Translate button style */
+.goog-te-gadget-simple {
+  background-color: transparent !important;
+  border: none !important;
+  font-family: inherit !important;
+  font-size: 14px !important;
+  color: var(--text-color) !important; /* Text color is dynamic, based on theme */
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 10px 20px !important;
+  border-radius: 8px !important;
+}
+
+.goog-te-gadget-simple span {
+  margin-right: 5px; /* Space between text */
+  color: var(--text-color) !important; 
+}
+
+.goog-te-combo {
+  background-color: var(--background) !important;
+  color: var(--text-color)!important; /* Text color for dropdown */
+  border: none !important;
+  border-radius: 4px !important;
+  padding: 4px !important;
+  font-size: 14px !important;
+  font-family: inherit !important;
+}
+
+.goog-te-combo .goog-te-menu-value {
+  color: var(--text-color) !important; /* Text color inside the dropdown */
+}
+
+/* Ensure the text color for the "Select Language" label also updates */
+.goog-te-gadget-simple .goog-te-menu-value {
+  color: var(--text-color) !important;
+}
+
+/* For the selected language in the dropdown */
+.goog-te-gadget-simple .goog-te-menu-value {
+  color: var(--text-color) !important; /* Text color is dynamic */
+  text-decoration: none !important;
+  font-weight: 500 !important;
+}
+
+/* Hover effect on the selected language */
+.goog-te-gadget-simple .goog-te-menu-value:hover {
+  color: var(--text-color) !important; 
+}
+
+/* Removing the Google icon */
+.goog-te-gadget-simple img {
+  display: none !important;
+}
+
+/* For Google Translate banner (if shown) */
+.goog-te-banner-frame.skiptranslate {
+  display: none !important;
+  color: var(--text-color) !important; 
+}
+
+/* Ensure consistent body styling */
+body {
+  top: 0 !important;
+}
