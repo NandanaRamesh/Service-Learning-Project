@@ -35,12 +35,9 @@ const VideoPage: React.FC = () => {
             <li key={grade.id}>
               <button
                 onClick={() => setSelectedGrade(grade.id)}
-                className={`w-full px-4 py-2 text-left rounded hover:bg-primary-color ${
-                  selectedGrade === grade.id
-                    ? "bg-primary-color text-foreground"
-                    : "bg-secondary-color text-inherit"
-                }`}
-              >
+                className={`w-full px-4 py-2 text-left rounded border border-gray-400 hover:bg-blue-500 ${
+                  selectedGrade === grade.id ? "bg-blue-500" : ""
+                }`}>
                 {grade.label}
               </button>
             </li>
@@ -61,7 +58,7 @@ const VideoPage: React.FC = () => {
             placeholder="Search videos..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full px-4 py-2 rounded bg-inherit border border-divider-color text-inherit focus:outline-none focus:ring-2 focus:ring-primary-color"
+            className="w-full px-4 py-2 rounded border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
 
@@ -71,8 +68,7 @@ const VideoPage: React.FC = () => {
               filteredVideos.map((video) => (
                 <div
                   key={video.id}
-                  className="card bg-inherit shadow hover:shadow-lg transition"
-                >
+                  className="p-4 rounded shadow hover:shadow-lg transition">
                   <img
                     src={video.thumbnail}
                     alt={video.title}
@@ -98,8 +94,7 @@ const VideoPage: React.FC = () => {
             videos.map((video) => (
               <div
                 key={video.id}
-                className="card bg-inherit shadow hover:shadow-lg transition"
-              >
+                className="p-4 rounded shadow hover:shadow-lg transition">
                 <img
                   src={video.thumbnail}
                   alt={video.title}

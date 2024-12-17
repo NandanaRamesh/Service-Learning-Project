@@ -15,8 +15,8 @@ const Signup: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-900 text-white">
-      <div className="w-full max-w-md p-8 bg-gray-800 rounded-lg shadow-lg">
+    <div className="min-h-screen flex items-center justify-center">
+      <div className="w-full max-w-md p-8 rounded-lg shadow-lg">
         <h1 className="text-3xl font-bold mb-4 text-center">Sign Up</h1>
         <p className="text-center text-gray-400">
           Already have an account?{" "}
@@ -29,29 +29,29 @@ const Signup: React.FC = () => {
             <input
               type="text"
               placeholder="First name"
-              className="w-1/2 px-4 py-2 bg-gray-700 rounded border border-gray-600 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-1/2 px-4 py-2 rounded border border-gray-600 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
             <input
               type="text"
               placeholder="Last name"
-              className="w-1/2 px-4 py-2 bg-gray-700 rounded border border-gray-600 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-1/2 px-4 py-2 rounded border border-gray-600 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
           <input
             type="email"
             placeholder="Email"
-            className="w-full px-4 py-2 bg-gray-700 rounded border border-gray-600 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-4 py-2 rounded border border-gray-600 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
           <input
             type="text"
             placeholder="Username"
-            className="w-full px-4 py-2 bg-gray-700 rounded border border-gray-600 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-4 py-2 rounded border border-gray-600 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
           <div className="relative">
             <input
               type={showPassword ? "text" : "password"}
               placeholder="Enter your password"
-              className="w-full px-4 py-2 bg-gray-700 rounded border border-gray-600 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 rounded border border-gray-600 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
             <button
               type="button"
@@ -64,7 +64,7 @@ const Signup: React.FC = () => {
             <input
               type={showConfirmPassword ? "text" : "password"}
               placeholder="Confirm your password"
-              className="w-full px-4 py-2 bg-gray-700 rounded border border-gray-600 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 rounded border border-gray-600 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
             <button
               type="button"
@@ -77,7 +77,7 @@ const Signup: React.FC = () => {
             <input
               type="checkbox"
               id="terms"
-              className="w-4 h-4 text-blue-500 bg-gray-700 rounded border-gray-600 focus:ring-blue-500"
+              className="w-4 h-4 text-blue-500 rounded border-gray-600 focus:ring-blue-500"
             />
             <label htmlFor="terms" className="text-gray-400">
               I agree to the{" "}

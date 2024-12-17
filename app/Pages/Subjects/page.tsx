@@ -47,17 +47,17 @@ const SubjectsPage: React.FC = () => {
   };
 
   return (
-    <div className="flex min-h-screen bg-gray-900 text-white">
+    <div className="flex min-h-screen">
       {/* Sidebar */}
-      <div className="w-1/4 bg-gray-800 p-4">
+      <div className="w-1/4 p-4">
         <h2 className="text-2xl font-bold mb-4 text-center">Subjects</h2>
         <ul className="space-y-2">
           {subjects.map((subject) => (
             <li key={subject.id}>
               <button
                 onClick={() => handleSubjectChange(subject.id)}
-                className={`w-full px-4 py-2 text-left rounded hover:bg-blue-500 ${
-                  selectedSubject === subject.id ? "bg-blue-500" : "bg-gray-700"
+                className={`w-full px-4 py-2 text-left rounded border border-gray-400 hover:bg-blue-500 ${
+                  selectedSubject === subject.id ? "bg-blue-500" : ""
                 }`}>
                 {subject.label}
               </button>
@@ -83,7 +83,7 @@ const SubjectsPage: React.FC = () => {
             placeholder="Search videos..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full px-4 py-2 rounded bg-gray-800 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-4 py-2 rounded border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
 
@@ -93,7 +93,7 @@ const SubjectsPage: React.FC = () => {
               filteredVideos.map((video) => (
                 <div
                   key={video.id}
-                  className="bg-gray-800 p-4 rounded shadow hover:shadow-lg transition">
+                  className="p-4 rounded shadow hover:shadow-lg transition">
                   <img
                     src={video.thumbnail}
                     alt={video.title}
@@ -116,7 +116,7 @@ const SubjectsPage: React.FC = () => {
             videos.map((video) => (
               <div
                 key={video.id}
-                className="bg-gray-800 p-4 rounded shadow hover:shadow-lg transition">
+                className="p-4 rounded shadow hover:shadow-lg transition">
                 <img
                   src={video.thumbnail}
                   alt={video.title}
