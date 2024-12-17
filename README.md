@@ -1,6 +1,14 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
-To download Next.js: https://nextjs.org
+To run it:
+
+1. Install Node.js: https://nodejs.org/en
+2. After installing, find the path where it's installed.( C:\Program Files\nodejs or something similar) Copy that path.
+3. Control Panel -> System & Settings -> System -> Advanced System Settings -> Environmental Variables -> System Variables -> Add new path and name it Node.js and paste the path there.
+4. Click ok and restart
+5. Download this file. Open in VSCode
+6. Go to terminal
+7. Type ```npm run dev```, then ctrl + click on the local link. And you can view the website.
 
 ## Getting Started
 
