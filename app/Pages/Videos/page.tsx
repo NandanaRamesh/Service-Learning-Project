@@ -1,35 +1,52 @@
 "use client";
 
-import React, { useState } from "react";
-import { videosData } from "@/app/components/videosData";
+import React, { useState, useEffect } from "react";
+import { fetchVideosByGrade } from "@/app/lib/lib/videoGrade";
+
+interface Video {
+  video_id: string;
+  title: string;
+  description: string;
+  source_url: string;
+  tags: string;
+  grade_id: string;
+}
 
 const VideoPage: React.FC = () => {
-  const [selectedGrade, setSelectedGrade] = useState<string>("1-3");
+  const [selectedGrade, setSelectedGrade] = useState<string>("G0014"); // Default grade_id
   const [searchQuery, setSearchQuery] = useState<string>("");
+  const [videos, setVideos] = useState<Video[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
 
+  // Grade options
   const grades = [
-    { label: "Grades 1-3", id: "1-3" },
-    { label: "Grades 4-6", id: "4-6" },
-    { label: "Grades 7-8", id: "7-8" },
-    { label: "Grades 9-10", id: "9-10" },
-    { label: "Grades 11-12", id: "11-12" },
+    { label: "Grades 1-4", id: "G0014" },
+    { label: "Grades 5-7", id: "G0057" },
+    { label: "Grades 8-10", id: "G0810" },
   ];
 
-  // Combine all videos across grades and filter by search query
-  const allVideos = Object.values(videosData).flat();
-  const filteredVideos = allVideos.filter((video) =>
+  // Fetch videos when grade changes
+  useEffect(() => {
+    const loadVideos = async () => {
+      setLoading(true);
+      const data = await fetchVideosByGrade(selectedGrade);
+      setVideos(data);
+      setLoading(false);
+    };
+
+    loadVideos();
+  }, [selectedGrade]);
+
+  // Filter videos by search query
+  const filteredVideos = videos.filter((video) =>
     video.title.toLowerCase().includes(searchQuery.toLowerCase())
   );
-
-  const videos = videosData[selectedGrade] || [];
 
   return (
     <div className="flex min-h-screen bg-inherit text-inherit">
       {/* Sidebar */}
       <div className="w-1/4 bg-inherit p-4">
-        <h2 className="text-2xl font-bold mb-4 text-center text-inherit">
-          Grades
-        </h2>
+        <h2 className="text-2xl font-bold mb-4 text-center text-inherit">Grades</h2>
         <ul className="space-y-2">
           {grades.map((grade) => (
             <li key={grade.id}>
@@ -37,7 +54,8 @@ const VideoPage: React.FC = () => {
                 onClick={() => setSelectedGrade(grade.id)}
                 className={`w-full px-4 py-2 text-left rounded border border-gray-400 hover:bg-blue-500 ${
                   selectedGrade === grade.id ? "bg-blue-500" : ""
-                }`}>
+                }`}
+              >
                 {grade.label}
               </button>
             </li>
@@ -48,7 +66,7 @@ const VideoPage: React.FC = () => {
       {/* Main Content */}
       <div className="flex-1 p-6 bg-inherit">
         <h1 className="text-3xl font-bold mb-6 text-inherit">
-          Videos for {selectedGrade}
+          Videos for {grades.find((grade) => grade.id === selectedGrade)?.label}
         </h1>
 
         {/* Search Bar */}
@@ -62,61 +80,34 @@ const VideoPage: React.FC = () => {
           />
         </div>
 
-        <div className="grid bg-inherit grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {searchQuery ? (
-            filteredVideos.length > 0 ? (
-              filteredVideos.map((video) => (
-                <div
-                  key={video.id}
-                  className="p-4 rounded shadow hover:shadow-lg transition">
-                  <img
-                    src={video.thumbnail}
-                    alt={video.title}
-                    className="w-full h-32 object-cover rounded"
-                  />
-                  <h2 className="text-lg font-semibold mt-2 text-inherit">
-                    {video.title}
-                  </h2>
-                  <a
-                    href={video.videoSrc}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-block mt-2 text-primary-color hover:underline"
-                  >
-                    Watch Video
-                  </a>
-                </div>
-              ))
-            ) : (
-              <p className="text-inherit">No videos found for the search query.</p>
-            )
-          ) : videos.length > 0 ? (
-            videos.map((video) => (
+        {/* Video Grid */}
+        {loading ? (
+          <p>Loading videos...</p>
+        ) : filteredVideos.length > 0 ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            {filteredVideos.map((video) => (
               <div
-                key={video.id}
-                className="p-4 rounded shadow hover:shadow-lg transition">
-                <img
-                  src={video.thumbnail}
-                  alt={video.title}
-                  className="w-full h-32 object-cover rounded"
-                />
+                key={video.video_id}
+                className="p-4 rounded shadow hover:shadow-lg transition"
+              >
                 <h2 className="text-lg font-semibold mt-2 text-inherit">
                   {video.title}
                 </h2>
+                <p className="text-sm text-gray-500">{video.description}</p>
                 <a
-                  href={video.videoSrc}
+                  href={video.source_url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-block mt-2 text-primary-color hover:underline"
+                  className="inline-block mt-2 text-blue-600 hover:underline"
                 >
                   Watch Video
                 </a>
               </div>
-            ))
-          ) : (
-            <p className="text-inherit">No videos available for this grade.</p>
-          )}
-        </div>
+            ))}
+          </div>
+        ) : (
+          <p>No videos found.</p>
+        )}
       </div>
     </div>
   );
