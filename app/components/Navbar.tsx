@@ -92,10 +92,16 @@ const Navbar: React.FC = () => {
                 <summary>Worksheets</summary>
                 <ul className="p-2">
                   <li>
-                    <Link href="#">3.1</Link>
+                    <Link href="#">Maths</Link>
                   </li>
                   <li>
-                    <Link href="#">3.2</Link>
+                    <Link href="#">Science</Link>
+                  </li>
+                  <li>
+                    <Link href="#">English</Link>
+                  </li>
+                  <li>
+                    <Link href="#">Kannada</Link>
                   </li>
                 </ul>
               </details>
@@ -115,9 +121,6 @@ const Navbar: React.FC = () => {
                   </li>
                   <li>
                     <Link href="#">Sample 4</Link>
-                  </li>
-                  <li>
-                    <Link href="#">Sample 5</Link>
                   </li>
                 </ul>
               </details>
@@ -155,33 +158,36 @@ const Navbar: React.FC = () => {
             </ul>
           </li>
           <li className="group relative">
-            <Link href="#">Worksheets</Link>
+            <Link href="/Pages/Worksheets">Worksheets</Link>
             <ul className="absolute left-0 top-full hidden group-hover:block bg-base-100 p-2 shadow rounded-box z-[100]">
               <li>
-                <Link href="#">3.1</Link>
+                <Link href="/Pages/Worksheets?tab=maths">Maths</Link>
               </li>
               <li>
-                <Link href="#">3.2</Link>
+                <Link href="/Pages/Worksheets?tab=science">Science</Link>
+              </li>
+              <li>
+                <Link href="/Pages/Worksheets?tab=english">English</Link>
+              </li>
+              <li>
+                <Link href="/Pages/Worksheets?tab=kannada">Kannada</Link>
               </li>
             </ul>
           </li>
           <li className="group relative">
-            <Link href="#">Activities</Link>
+            <Link href="/Pages/Activities">Activities</Link>
             <ul className="absolute left-0 top-full hidden group-hover:block bg-base-100 p-2 shadow rounded-box z-[100]">
               <li>
-                <Link href="#">Sample 1</Link>
+                <Link href="/Pages/Activities?tab=crafts">Crafts</Link>
               </li>
               <li>
-                <Link href="#">Sample 2</Link>
+                <Link href="/Pages/Activities?tab=arts">Arts</Link>
               </li>
               <li>
-                <Link href="#">Sample 3</Link>
+                <Link href="/Pages/Activities?tab=games">Games</Link>
               </li>
               <li>
-                <Link href="#">Sample 4</Link>
-              </li>
-              <li>
-                <Link href="#">Sample 5</Link>
+                <Link href="/Pages/Activities?tab=edutainment">Edutainment</Link>
               </li>
             </ul>
           </li>
