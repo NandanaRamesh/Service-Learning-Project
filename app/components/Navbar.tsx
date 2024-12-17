@@ -39,7 +39,6 @@ const Navbar: React.FC = () => {
     loadGoogleTranslate();
   }, []);
 
-
   return (
     <div className="navbar bg-base-100 relative z-50">
       {/* Mobile View */}
@@ -51,8 +50,7 @@ const Navbar: React.FC = () => {
               className="h-5 w-5"
               fill="none"
               viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
+              stroke="currentColor">
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -63,8 +61,7 @@ const Navbar: React.FC = () => {
           </div>
           <ul
             tabIndex={0}
-            className="menu menu-sm dropdown-content bg-base-100 rounded-box z-[60] mt-3 w-52 p-2 shadow"
-          >
+            className="menu menu-sm dropdown-content bg-base-100 rounded-box z-[60] mt-3 w-52 p-2 shadow">
             <li>
               <Link href="/">Home</Link>
             </li>
@@ -192,6 +189,9 @@ const Navbar: React.FC = () => {
                 <Link href="#">Sample 5</Link>
               </li>
             </ul>
+          </li>
+          <li>
+            <Link href="/Pages/Support">Support</Link>
           </li>
         </ul>
       </div>
