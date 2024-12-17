@@ -55,18 +55,4 @@ export const subjectData = {
       videoSrc: "https://www.w3schools.com/html/mov_bbb.mp4",
     },
   ],
-  "arts-and-crafts": [
-    {
-      id: 15.1,
-      title: "Arts & Crafts Video 1",
-      thumbnail: "https://via.placeholder.com/150",
-      videoSrc: "https://www.w3schools.com/html/movie.mp4",
-    },
-    {
-      id: 15.2,
-      title: "Arts & Crafts Video 2",
-      thumbnail: "https://via.placeholder.com/150",
-      videoSrc: "https://www.w3schools.com/html/mov_bbb.mp4",
-    },
-  ],
 };

@@ -18,8 +18,8 @@ const HomePage: React.FC = () => {
   };
 
   // Example button action for "Join Discussions"
-  const handleJoinDiscussionsClick = () => {
-    console.log("Navigating to discussions...");
+  const handleGetSupportClick = () => {
+    router.push("Pages/Support");
     // You can add a redirection here, e.g., router.push("/Pages/Discussions");
   };
 
@@ -38,8 +38,8 @@ const HomePage: React.FC = () => {
           />
           <VideoCard
             videoSrc="https://www.w3schools.com/html/movie.mp4" // Add your video URL
-            buttonText="Join Discussions"
-            buttonAction={handleJoinDiscussionsClick} // Placeholder for discussions
+            buttonText="Get Support"
+            buttonAction={handleGetSupportClick} // Placeholder for discussions
             videoId="video2" // Unique video ID for identification
             onPlay={handlePlayVideo}
             isPlaying={currentPlaying === "video2"}
