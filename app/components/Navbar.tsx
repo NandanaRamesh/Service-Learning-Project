@@ -2,14 +2,27 @@
 
 import React, { useEffect, useState, useRef } from "react";
 import Link from "next/link";
+import { supabase } from "@/app/lib/lib/supabaseClient"; // Import supabase client
 import ThemeSwitch from "./ThemeSwitch";
 
 const Navbar: React.FC = () => {
   const [language, setLanguage] = useState("en");
+  const [user, setUser] = useState<any>(null); // State to track the logged-in user
   const googleTranslateElementRef = useRef<HTMLDivElement | null>(null); // Define the ref
   const translateElementRef = useRef<any>(null); // Reference to the translate element instance
 
   useEffect(() => {
+    // Check user session on mount
+    const session = supabase.auth.getSession();
+    setUser(session?.user);
+
+    // Listen for changes in the user's authentication state
+    const { data: authListener } = supabase.auth.onAuthStateChange(
+      (_event, session) => {
+        setUser(session?.user);
+      }
+    );
+
     const loadGoogleTranslate = () => {
       const script = document.createElement("script");
       script.type = "text/javascript";
@@ -37,7 +50,16 @@ const Navbar: React.FC = () => {
     };
 
     loadGoogleTranslate();
+
+    return () => {
+      authListener?.unsubscribe(); // Cleanup the listener
+    };
   }, []);
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+    setUser(null); // Reset user state after sign out
+  };
 
   return (
     <div className="navbar bg-base-100 relative z-50">
@@ -65,66 +87,22 @@ const Navbar: React.FC = () => {
             <li>
               <Link href="/">Home</Link>
             </li>
-            <li tabIndex={0}>
-              <details>
-                <summary>Subjects</summary>
-                <ul className="p-2">
-                  <li>
-                    <Link href="#">Basic Maths</Link>
-                  </li>
-                  <li>
-                    <Link href="#">English Grammar</Link>
-                  </li>
-                  <li>
-                    <Link href="#">Science</Link>
-                  </li>
-                  <li>
-                    <Link href="#">Facts</Link>
-                  </li>
-                  <li>
-                    <Link href="#">Arts & Crafts</Link>
-                  </li>
-                </ul>
-              </details>
-            </li>
-            <li tabIndex={0}>
-              <details>
-                <summary>Worksheets</summary>
-                <ul className="p-2">
-                  <li>
-                    <Link href="#">Maths</Link>
-                  </li>
-                  <li>
-                    <Link href="#">Science</Link>
-                  </li>
-                  <li>
-                    <Link href="#">English</Link>
-                  </li>
-                  <li>
-                    <Link href="#">Kannada</Link>
-                  </li>
-                </ul>
-              </details>
-            </li>
-            <li tabIndex={0}>
-              <details>
-                <summary>Activities</summary>
-                <ul className="p-2">
-                  <li>
-                    <Link href="#">Sample 1</Link>
-                  </li>
-                  <li>
-                    <Link href="#">Sample 2</Link>
-                  </li>
-                  <li>
-                    <Link href="#">Sample 3</Link>
-                  </li>
-                  <li>
-                    <Link href="#">Sample 4</Link>
-                  </li>
-                </ul>
-              </details>
-            </li>
+            {user && (
+              <>
+                <li>
+                  <Link href="/Pages/Subjects">Subjects</Link>
+                </li>
+                <li>
+                  <Link href="/Pages/Worksheets">Worksheets</Link>
+                </li>
+                <li>
+                  <Link href="/Pages/Activities">Activities</Link>
+                </li>
+                <li>
+                  <Link href="/Pages/Support">Support</Link>
+                </li>
+              </>
+            )}
           </ul>
         </div>
         <Link href="/" className="btn btn-ghost text-xl">
@@ -138,74 +116,40 @@ const Navbar: React.FC = () => {
           <li>
             <Link href="/">Home</Link>
           </li>
-          <li className="group relative">
-            <Link href="/Pages/Subjects">Subjects</Link>
-            <ul className="absolute left-0 top-full hidden group-hover:block bg-base-100 p-2 shadow rounded-box z-[100]">
+          {user && (
+            <>
               <li>
-                <Link href="/Pages/Subjects?tab=english-grammar">
-                  English Grammar
-                </Link>
+                <Link href="/Pages/Subjects">Subjects</Link>
               </li>
               <li>
-                <Link href="/Pages/Subjects?tab=science">Science</Link>
+                <Link href="/Pages/Worksheets">Worksheets</Link>
               </li>
               <li>
-                <Link href="/Pages/Subjects?tab=basic-maths">Basic Maths</Link>
+                <Link href="/Pages/Activities">Activities</Link>
               </li>
               <li>
-                <Link href="/Pages/Subjects?tab=facts">Facts</Link>
+                <Link href="/Pages/Support">Support</Link>
               </li>
-            </ul>
-          </li>
-          <li className="group relative">
-            <Link href="/Pages/Worksheets">Worksheets</Link>
-            <ul className="absolute left-0 top-full hidden group-hover:block bg-base-100 p-2 shadow rounded-box z-[100]">
-              <li>
-                <Link href="/Pages/Worksheets?tab=maths">Maths</Link>
-              </li>
-              <li>
-                <Link href="/Pages/Worksheets?tab=science">Science</Link>
-              </li>
-              <li>
-                <Link href="/Pages/Worksheets?tab=english">English</Link>
-              </li>
-              <li>
-                <Link href="/Pages/Worksheets?tab=kannada">Kannada</Link>
-              </li>
-            </ul>
-          </li>
-          <li className="group relative">
-            <Link href="/Pages/Activities">Activities</Link>
-            <ul className="absolute left-0 top-full hidden group-hover:block bg-base-100 p-2 shadow rounded-box z-[100]">
-              <li>
-                <Link href="/Pages/Activities?tab=crafts">Crafts</Link>
-              </li>
-              <li>
-                <Link href="/Pages/Activities?tab=arts">Arts</Link>
-              </li>
-              <li>
-                <Link href="/Pages/Activities?tab=games">Games</Link>
-              </li>
-              <li>
-                <Link href="/Pages/Activities?tab=edutainment">Edutainment</Link>
-              </li>
-            </ul>
-          </li>
-          <li>
-            <Link href="/Pages/Support">Support</Link>
-          </li>
+            </>
+          )}
         </ul>
       </div>
 
       {/* Right Side */}
       <div className="navbar-end flex items-center space-x-4">
-        <Link href="/Pages/login" className="btn btn-primary">
-          Login
-        </Link>
-        <ThemeSwitch />
+        <ThemeSwitch /> {/* Always visible */}
+        <div ref={googleTranslateElementRef}></div> {/* Always visible */}
+
+        {user ? (
+          <button onClick={handleSignOut} className="btn btn-primary">
+            Sign Out
+          </button>
+        ) : (
+          <Link href="/Pages/login" className="btn btn-primary">
+            Login/Signup
+          </Link>
+        )}
       </div>
-      {/* Google Translate Widget */}
-      <div ref={googleTranslateElementRef}></div>
     </div>
   );
 };

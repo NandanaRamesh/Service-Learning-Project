@@ -1,48 +1,54 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { fetchVideosBySubject, searchVideosBySubject } from "@/app/lib/lib/videosSubject";
 import { useSearchParams, useRouter } from "next/navigation";
-import { subjectData } from "@/app/components/subjectData";
+
+interface Video {
+  video_id: string;
+  title: string;
+  description: string;
+  source_url: string;
+  tags: string;
+  subject_id: string;
+}
 
 const SubjectsPage: React.FC = () => {
   const searchParams = useSearchParams();
   const router = useRouter();
 
-  // Get the initial tab from the query parameter or default to "basic-maths"
-  const initialTab = searchParams.get("tab") || "basic-maths";
-  const [selectedSubject, setSelectedSubject] = useState<string>(initialTab);
+  const initialSubject = searchParams.get("subject") || "S0001"; // Default to "Math" (S0001)
+  const [selectedSubject, setSelectedSubject] = useState<string>(initialSubject);
   const [searchQuery, setSearchQuery] = useState<string>("");
+  const [videos, setVideos] = useState<Video[]>([]);
 
   const subjects = [
-    { label: "Basic Maths", id: "basic-maths" },
-    { label: "English Grammar", id: "english-grammar" },
-    { label: "Science", id: "science" },
-    { label: "Facts", id: "facts" },
+    { label: "Math", id: "S0001" },
+    { label: "Science", id: "S0002" },
+    { label: "English", id: "S0003" },
+    { label: "Physics", id: "S0004" },
+    { label: "Chemistry", id: "S0005" },
+    { label: "Biology", id: "S0006" },
+    { label: "GS & ES", id: "S0007" },
   ];
 
-  // Combine all videos across subjects and filter by search query
-  const allVideos = Object.values(subjectData).flat();
-  const filteredVideos = allVideos.filter((video) =>
-    video.title.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-
-  // Filter videos for the selected subject
-  const videos = subjectData[selectedSubject] || [];
-
-  // Update the selected subject when the URL changes
   useEffect(() => {
-    const tab = searchParams.get("tab");
-    if (tab) {
-      setSelectedSubject(tab);
-    }
-  }, [searchParams]);
+    const fetchData = async () => {
+      if (searchQuery) {
+        const searchResults = await searchVideosBySubject(selectedSubject, searchQuery);
+        setVideos(searchResults);
+      } else {
+        const videosBySubject = await fetchVideosBySubject(selectedSubject);
+        setVideos(videosBySubject);
+      }
+    };
 
-  // Handle sidebar tab selection
+    fetchData();
+  }, [selectedSubject, searchQuery]);
+
   const handleSubjectChange = (subjectId: string) => {
-    if (subjectId !== selectedSubject) {
-      setSelectedSubject(subjectId);
-      router.push(`/Pages/Subjects?tab=${subjectId}`); // Update the URL to reflect the active tab
-    }
+    setSelectedSubject(subjectId);
+    router.push(`/Pages/Subjects?subject=${subjectId}`);
   };
 
   return (
@@ -57,7 +63,8 @@ const SubjectsPage: React.FC = () => {
                 onClick={() => handleSubjectChange(subject.id)}
                 className={`w-full px-4 py-2 text-left rounded border border-gray-400 hover:bg-blue-500 ${
                   selectedSubject === subject.id ? "bg-blue-500" : ""
-                }`}>
+                }`}
+              >
                 {subject.label}
               </button>
             </li>
@@ -70,9 +77,7 @@ const SubjectsPage: React.FC = () => {
         <h1 className="text-3xl font-bold mb-6">
           {searchQuery
             ? `Search Results for "${searchQuery}"`
-            : `Videos for ${
-                subjects.find((s) => s.id === selectedSubject)?.label
-              }`}
+            : `Videos for ${subjects.find((s) => s.id === selectedSubject)?.label}`}
         </h1>
 
         {/* Search Bar */}
@@ -86,53 +91,30 @@ const SubjectsPage: React.FC = () => {
           />
         </div>
 
+        {/* Videos Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {searchQuery ? (
-            filteredVideos.length > 0 ? (
-              filteredVideos.map((video) => (
-                <div
-                  key={video.id}
-                  className="p-4 rounded shadow hover:shadow-lg transition">
-                  <img
-                    src={video.thumbnail}
-                    alt={video.title}
-                    className="w-full h-32 object-cover rounded"
-                  />
-                  <h2 className="text-lg font-semibold mt-2">{video.title}</h2>
-                  <a
-                    href={video.videoSrc}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-block mt-2 text-blue-400 hover:text-blue-300 underline">
-                    Watch Video
-                  </a>
-                </div>
-              ))
-            ) : (
-              <p>No videos found for the search query.</p>
-            )
-          ) : videos.length > 0 ? (
+          {videos.length > 0 ? (
             videos.map((video) => (
               <div
-                key={video.id}
-                className="p-4 rounded shadow hover:shadow-lg transition">
-                <img
-                  src={video.thumbnail}
-                  alt={video.title}
-                  className="w-full h-32 object-cover rounded"
-                />
-                <h2 className="text-lg font-semibold mt-2">{video.title}</h2>
+                key={video.video_id}
+                className="p-4 rounded shadow hover:shadow-lg transition"
+              >
+                {/* Dynamically generated thumbnail */}
+                <div className="w-full h-32 bg-white flex items-center justify-center rounded">
+                  <p className="text-lg font-semibold text-center">{video.title}</p>
+                </div>
                 <a
-                  href={video.videoSrc}
+                  href={video.source_url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-block mt-2 text-blue-400 hover:text-blue-300 underline">
+                  className="inline-block mt-2 text-blue-400 hover:text-blue-300 underline"
+                >
                   Watch Video
                 </a>
               </div>
             ))
           ) : (
-            <p>No videos available for this subject.</p>
+            <p>No videos found.</p>
           )}
         </div>
       </div>

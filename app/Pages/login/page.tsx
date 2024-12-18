@@ -1,11 +1,25 @@
 "use client";
 import React, { useState } from "react";
+import { supabase } from "@/app/lib/lib/supabaseClient"; // Import supabase client
 
 const Login: React.FC = () => {
-  const [showPassword, setShowPassword] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
 
-  const togglePasswordVisibility = () => {
-    setShowPassword((prev) => !prev);
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    if (error) {
+      setError(error.message);
+    } else {
+      // Redirect to the home page after successful login
+      window.location.href = "/"; // Redirect to home page
+    }
   };
 
   return (
@@ -18,33 +32,28 @@ const Login: React.FC = () => {
             Sign up
           </a>
         </p>
-        <form className="space-y-4 mt-6">
+        <form className="space-y-4 mt-6" onSubmit={handleLogin}>
           <input
             type="email"
             placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
             className="w-full px-4 py-2 rounded border border-gray-600 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
           <div className="relative">
             <input
-              type={showPassword ? "text" : "password"}
+              type="password"
               placeholder="Enter your password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
               className="w-full px-4 py-2 rounded border border-gray-600 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
-            <button
-              type="button"
-              onClick={togglePasswordVisibility}
-              className="absolute inset-y-0 right-3 flex items-center text-gray-400 hover:text-white">
-              {showPassword ? "👁️" : "🙈"}
-            </button>
           </div>
-          <div className="flex items-center justify-between">
-            <a href="/Pages/ForgotPassword" className="text-blue-500 underline">
-              Forgot Password?
-            </a>
-          </div>
+          {error && <p className="text-red-500">{error}</p>}
           <button
             type="submit"
-            className="w-full py-2 btn btn-primary text-white font-semibold rounded transition">
+            className="w-full py-2 btn btn-primary text-white font-semibold rounded transition"
+          >
             Log In
           </button>
         </form>

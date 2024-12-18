@@ -1,12 +1,22 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation"; // Import useRouter from Next.js
+import { supabase } from "@/app/lib/lib/supabaseClient"; // Adjust according to your supabase client import
 import VideoCard from "./components/VideoCard"; // Import VideoCard
 
 const HomePage: React.FC = () => {
   const [currentPlaying, setCurrentPlaying] = useState<string | null>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false); // State for authentication
   const router = useRouter(); // Initialize useRouter for navigation
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      const user = await supabase.auth.getUser(); // Get the current user from Supabase
+      setIsAuthenticated(user.data !== null); // Check if user is authenticated
+    };
+    checkAuth();
+  }, []);
 
   const handlePlayVideo = (videoId: string) => {
     setCurrentPlaying((prev) => (prev === videoId ? null : videoId));
@@ -14,13 +24,20 @@ const HomePage: React.FC = () => {
 
   // Redirect to /Pages/Videos
   const handleWatchVideosClick = () => {
-    router.push("Pages/Videos");
+    if (!isAuthenticated) {
+      router.push("/Pages/login"); // Redirect to login page if not authenticated
+      return; // Stop further execution if not authenticated
+    }
+    router.push("/Pages/Videos"); // Redirect to the videos page if authenticated
   };
 
-  // Example button action for "Join Discussions"
+  // Example button action for "Get Support"
   const handleGetSupportClick = () => {
-    router.push("Pages/Support");
-    // You can add a redirection here, e.g., router.push("/Pages/Discussions");
+    if (!isAuthenticated) {
+      router.push("/Pages/login"); // Redirect to login page if not authenticated
+      return; // Stop further execution if not authenticated
+    }
+    router.push("/Pages/Support"); // Redirect to the support page if authenticated
   };
 
   return (

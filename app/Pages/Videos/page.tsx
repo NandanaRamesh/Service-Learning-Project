@@ -90,10 +90,10 @@ const VideoPage: React.FC = () => {
                 key={video.video_id}
                 className="p-4 rounded shadow hover:shadow-lg transition"
               >
-                <h2 className="text-lg font-semibold mt-2 text-inherit">
-                  {video.title}
-                </h2>
-                <p className="text-sm text-gray-500">{video.description}</p>
+                {/* Dynamically generated thumbnail */}
+                <div className="w-full h-32 bg-white flex items-center justify-center rounded">
+                  <p className="text-lg font-semibold text-center">{video.title}</p>
+                </div>
                 <a
                   href={video.source_url}
                   target="_blank"

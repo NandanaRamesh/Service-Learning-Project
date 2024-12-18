@@ -1,17 +1,35 @@
-"use client"; // Required for using React hooks in Next.js App Router
-
+"use client";
 import React, { useState } from "react";
+import { supabase } from "@/app/lib/lib/supabaseClient"; // Import supabase client
 
 const Signup: React.FC = () => {
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [username, setUsername] = useState("");
+  const [error, setError] = useState("");
 
-  const togglePasswordVisibility = () => {
-    setShowPassword((prev) => !prev);
-  };
+  const handleSignup = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+    });
 
-  const toggleConfirmPasswordVisibility = () => {
-    setShowConfirmPassword((prev) => !prev);
+    if (error) {
+      setError(error.message);
+    } else {
+      // Optionally update user profile (e.g., username)
+      const { error: profileError } = await supabase
+        .from("profiles")
+        .upsert([{ id: data.user.id, username }]);
+
+      if (profileError) {
+        setError(profileError.message);
+      } else {
+        // Redirect to login or dashboard after successful signup
+        window.location.href = "/login"; // Example
+      }
+    }
   };
 
   return (
@@ -24,71 +42,35 @@ const Signup: React.FC = () => {
             Log in
           </a>
         </p>
-        <form className="space-y-4 mt-6">
-          <div className="flex space-x-4">
-            <input
-              type="text"
-              placeholder="First name"
-              className="w-1/2 px-4 py-2 rounded border border-gray-600 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-            <input
-              type="text"
-              placeholder="Last name"
-              className="w-1/2 px-4 py-2 rounded border border-gray-600 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
+        <form className="space-y-4 mt-6" onSubmit={handleSignup}>
           <input
             type="email"
             placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
             className="w-full px-4 py-2 rounded border border-gray-600 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
           <input
             type="text"
             placeholder="Username"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
             className="w-full px-4 py-2 rounded border border-gray-600 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
           <div className="relative">
             <input
-              type={showPassword ? "text" : "password"}
+              type="password"
               placeholder="Enter your password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
               className="w-full px-4 py-2 rounded border border-gray-600 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
-            <button
-              type="button"
-              onClick={togglePasswordVisibility}
-              className="absolute inset-y-0 right-3 flex items-center text-gray-400 hover:text-white">
-              {showPassword ? "👁️" : "🙈"}
-            </button>
           </div>
-          <div className="relative">
-            <input
-              type={showConfirmPassword ? "text" : "password"}
-              placeholder="Confirm your password"
-              className="w-full px-4 py-2 rounded border border-gray-600 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-            <button
-              type="button"
-              onClick={toggleConfirmPasswordVisibility}
-              className="absolute inset-y-0 right-3 flex items-center text-gray-400 hover:text-white">
-              {showConfirmPassword ? "👁️" : "🙈"}
-            </button>
-          </div>
-          <div className="flex items-center space-x-2">
-            <input
-              type="checkbox"
-              id="terms"
-              className="w-4 h-4 text-blue-500 rounded border-gray-600 focus:ring-blue-500"
-            />
-            <label htmlFor="terms" className="text-gray-400">
-              I agree to the{" "}
-              <a href="#" className="text-blue-500 underline">
-                Terms & Conditions
-              </a>
-            </label>
-          </div>
+          {error && <p className="text-red-500">{error}</p>}
           <button
             type="submit"
-            className="w-full py-2 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded transition">
+            className="w-full py-2 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded transition"
+          >
             Sign Up
           </button>
         </form>
