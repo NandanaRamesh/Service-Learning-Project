@@ -61,10 +61,13 @@ const AddVideos: React.FC = () => {
             className="w-full p-2 border rounded"
             required>
             <option value="">Select Subject</option>
-            <option value="English Grammar">English Grammar</option>
+            <option value="English Grammar">Maths</option>
             <option value="Science">Science</option>
-            <option value="Basic Maths">Basic Maths</option>
-            <option value="Facts">Facts</option>
+            <option value="Basic Maths">English</option>
+            <option value="Facts">Physics</option>
+            <option value="Facts">Chemistry</option>
+            <option value="Facts">Biology</option>
+            <option value="Facts">GS & ES</option>
           </select>
         </div>
 
