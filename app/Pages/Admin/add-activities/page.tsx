@@ -1,19 +1,16 @@
 "use client";
 
 import React, { useState } from "react";
+import Link from "next/link";
 
 const AddActivities: React.FC = () => {
-  const [activitySourceType, setActivitySourceType] = useState<
-    "url" | "file" | "video"
-  >("url");
+  const [activitySourceType, setActivitySourceType] = useState<"url">("url");
   const [formData, setFormData] = useState({
     activityType: "",
     title: "",
     description: "",
     ageGroup: "",
     activityUrl: "",
-    activityFile: null,
-    videoFile: null,
   });
 
   const handleChange = (
@@ -21,21 +18,15 @@ const AddActivities: React.FC = () => {
       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
     >
   ) => {
-    const { name, value, files } = e.target as HTMLInputElement;
-    if (files) {
-      setFormData({ ...formData, [name]: files[0] });
-    } else {
-      setFormData({ ...formData, [name]: value });
-    }
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
   };
 
-  const handleSourceTypeChange = (type: "url" | "file" | "video") => {
-    setActivitySourceType(type);
+  const handleSourceTypeChange = () => {
+    setActivitySourceType("url");
     setFormData({
       ...formData,
       activityUrl: "",
-      activityFile: null,
-      videoFile: null,
     });
   };
 
@@ -115,40 +106,16 @@ const AddActivities: React.FC = () => {
           <div className="flex gap-4 mb-2">
             <button
               type="button"
-              className={`p-2 rounded ${
-                activitySourceType === "url"
-                  ? "bg-blue-500 text-white"
-                  : "bg-blue-500 text-white"
-              }`}
-              onClick={() => handleSourceTypeChange("url")}>
+              className={`p-2 rounded ${activitySourceType === "url"}`}>
               Activity URL
-            </button>
-            <button
-              type="button"
-              className={`p-2 rounded ${
-                activitySourceType === "video"
-                  ? "bg-blue-900 text-white"
-                  : "bg-blue-900 text-white"
-              }`}
-              onClick={() => handleSourceTypeChange("video")}>
-              Video File
             </button>
           </div>
 
-          {activitySourceType === "url" ? (
+          {activitySourceType === "url" && (
             <input
               type="url"
               name="activityUrl"
               placeholder="Enter activity URL"
-              onChange={handleChange}
-              className="w-full p-2 border rounded"
-              required
-            />
-          ) : (
-            <input
-              type="file"
-              name="videoFile"
-              accept="video/*"
               onChange={handleChange}
               className="w-full p-2 border rounded"
               required
@@ -163,6 +130,15 @@ const AddActivities: React.FC = () => {
           Submit Activity
         </button>
       </form>
+
+      {/* Back to Admin Button */}
+      <div className="mt-6">
+        <Link
+          href="/Pages/Admin"
+          className="w-full bg-gray-300 text-black py-2 rounded hover:bg-gray-400 text-center block">
+          Back to Admin Dashboard
+        </Link>
+      </div>
     </div>
   );
 };

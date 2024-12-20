@@ -93,9 +93,6 @@ const Navbar: React.FC = () => {
                   <Link href="/Pages/Subjects">Subjects</Link>
                 </li>
                 <li>
-                  <Link href="/Pages/Worksheets">Worksheets</Link>
-                </li>
-                <li>
                   <Link href="/Pages/Activities">Activities</Link>
                 </li>
                 <li>
@@ -122,9 +119,6 @@ const Navbar: React.FC = () => {
                 <Link href="/Pages/Subjects">Subjects</Link>
               </li>
               <li>
-                <Link href="/Pages/Worksheets">Worksheets</Link>
-              </li>
-              <li>
                 <Link href="/Pages/Activities">Activities</Link>
               </li>
               <li>
@@ -139,7 +133,6 @@ const Navbar: React.FC = () => {
       <div className="navbar-end flex items-center space-x-4">
         <ThemeSwitch /> {/* Always visible */}
         <div ref={googleTranslateElementRef}></div> {/* Always visible */}
-
         {user ? (
           <button onClick={handleSignOut} className="btn btn-primary">
             Sign Out

@@ -1,7 +1,8 @@
 "use client";
 
 import React, { useState } from "react";
-import { ticketsData } from "@/app/components/ticketsData"; // Assuming this is where ticketsData is defined
+import { ticketsData } from "@/app/components/ticketsData";
+import Link from "next/link";
 
 const ResolveTicketPage: React.FC = () => {
   const [resolvedTickets, setResolvedTickets] = useState(ticketsData);
@@ -91,6 +92,13 @@ const ResolveTicketPage: React.FC = () => {
             ))}
           </tbody>
         </table>
+      </div>
+      <div className="mt-6">
+        <Link
+          href="/Pages/Admin"
+          className="w-full bg-gray-300 text-black py-2 rounded hover:bg-gray-400 text-center block">
+          Back to Admin Dashboard
+        </Link>
       </div>
     </div>
   );

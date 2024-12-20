@@ -7,7 +7,7 @@ const AdminPage: React.FC = () => {
   return (
     <div className="p-6 min-h-screen flex flex-col items-center">
       <h1 className="text-3xl font-bold mb-6 text-center">Admin Dashboard</h1>
-      <div className="w-full max-w-4xl grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="w-full max-w-2xl flex flex-col gap-6">
         {/* Card Component */}
         <Card
           title="Add Videos"
@@ -16,14 +16,6 @@ const AdminPage: React.FC = () => {
           href="/Pages/Admin/add-videos"
           bgColor="bg-blue-500"
           hoverColor="hover:bg-blue-600"
-        />
-        <Card
-          title="Add Worksheets"
-          description="Create and upload worksheets."
-          buttonText="Go to Add Worksheets"
-          href="/Pages/Admin/add-worksheets"
-          bgColor="bg-green-500"
-          hoverColor="hover:bg-green-600"
         />
         <Card
           title="Add Activities"
