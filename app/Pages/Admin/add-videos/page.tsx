@@ -1,9 +1,9 @@
 "use client";
 
 import React, { useState } from "react";
+import Link from "next/link";
 
 const AddVideos: React.FC = () => {
-  const [videoSourceType, setVideoSourceType] = useState<"url" | "file">("url");
   const [formData, setFormData] = useState({
     title: "",
     subject: "",
@@ -12,7 +12,6 @@ const AddVideos: React.FC = () => {
     tags: "",
     thumbnail: null,
     videoUrl: "",
-    videoFile: null,
   });
 
   const handleChange = (
@@ -20,17 +19,12 @@ const AddVideos: React.FC = () => {
       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
     >
   ) => {
-    const { name, value, files } = e.target as HTMLInputElement;
+    const { name, value, files } = e.target;
     if (files) {
       setFormData({ ...formData, [name]: files[0] });
     } else {
       setFormData({ ...formData, [name]: value });
     }
-  };
-
-  const handleSourceTypeChange = (type: "url" | "file") => {
-    setVideoSourceType(type);
-    setFormData({ ...formData, videoUrl: "", videoFile: null });
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -83,10 +77,9 @@ const AddVideos: React.FC = () => {
             className="w-full p-2 border rounded"
             required>
             <option value="">Select Grade</option>
-            <option value="1-3">1-3</option>
-            <option value="4-6">4-6</option>
-            <option value="9-10">9-10</option>
-            <option value="11-12">11-12</option>
+            <option value="1-3">1-4</option>
+            <option value="4-6">5-7</option>
+            <option value="9-10">8-10</option>
           </select>
         </div>
 
@@ -125,51 +118,17 @@ const AddVideos: React.FC = () => {
           />
         </div>
 
-        {/* Video Source */}
+        {/* Video URL */}
         <div>
-          <label className="block font-semibold mb-2">Video Source</label>
-          <div className="flex gap-4 mb-2">
-            <button
-              type="button"
-              className={`p-2 rounded ${
-                videoSourceType === "url"
-                  ? "bg-blue-500 text-white"
-                  : "bg-blue-500 text-white"
-              }`}
-              onClick={() => handleSourceTypeChange("url")}>
-              Upload URL
-            </button>
-            <button
-              type="button"
-              className={`p-2 rounded ${
-                videoSourceType === "file"
-                  ? "bg-blue-700 text-white"
-                  : "bg-blue-700 text-white"
-              }`}
-              onClick={() => handleSourceTypeChange("file")}>
-              Upload File
-            </button>
-          </div>
-
-          {videoSourceType === "url" ? (
-            <input
-              type="url"
-              name="videoUrl"
-              placeholder="Enter video URL"
-              onChange={handleChange}
-              className="w-full p-2 border rounded"
-              required
-            />
-          ) : (
-            <input
-              type="file"
-              name="videoFile"
-              accept="video/*"
-              onChange={handleChange}
-              className="w-full p-2 border rounded"
-              required
-            />
-          )}
+          <label className="block font-semibold mb-1">Video URL</label>
+          <input
+            type="url"
+            name="videoUrl"
+            placeholder="Enter video URL"
+            onChange={handleChange}
+            className="w-full p-2 border rounded"
+            required
+          />
         </div>
 
         {/* Submit Button */}
@@ -179,6 +138,13 @@ const AddVideos: React.FC = () => {
           Submit Video
         </button>
       </form>
+      <div className="mt-6">
+        <Link
+          href="/Pages/Admin"
+          className="w-full bg-gray-300 text-black py-2 rounded hover:bg-gray-400 text-center block">
+          Back to Admin Dashboard
+        </Link>
+      </div>
     </div>
   );
 };
