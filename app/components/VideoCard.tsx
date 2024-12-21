@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useRef, useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation'; // Import useRouter from Next.js
-import { supabase } from "@/app/lib/lib/supabaseClient"; // Adjust according to your supabase client import
+import React, { useRef, useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { supabase } from "@/app/lib/lib/supabaseClient";
 
 interface VideoCardProps {
   videoSrc: string;
@@ -11,7 +11,6 @@ interface VideoCardProps {
   videoId: string;
   onPlay: (videoId: string) => void;
   isPlaying: boolean;
-  isAuthenticated: boolean; // Accept isAuthenticated as a prop
 }
 
 const VideoCard: React.FC<VideoCardProps> = ({
@@ -21,33 +20,27 @@ const VideoCard: React.FC<VideoCardProps> = ({
   videoId,
   onPlay,
   isPlaying,
-  isAuthenticated // Receive it as a prop
 }) => {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const [isMuted, setIsMuted] = useState(false);
   const [progress, setProgress] = useState(0);
-  const router = useRouter(); // Use router for navigation
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const router = useRouter();
 
-  // Check user authentication status on load
+  // Check user authentication status
   useEffect(() => {
     const checkAuth = async () => {
-      const user = await supabase.auth.getUser(); // Get the current user from Supabase
-      if (user.data) {
-        // User is authenticated
-        console.log("User is authenticated:", user.data);
-      } else {
-        // No user, not authenticated
-        console.log("User is not authenticated.");
-      }
+      const { data: { user } } = await supabase.auth.getUser();
+      setIsAuthenticated(!!user);
     };
-    checkAuth(); // Check authentication on component mount
+    checkAuth();
   }, []);
 
   // Toggle mute/unmute state
   const handleMute = () => {
     if (videoRef.current) {
       videoRef.current.muted = !isMuted;
-      setIsMuted(prevState => !prevState);
+      setIsMuted((prev) => !prev);
     }
   };
 
@@ -60,7 +53,7 @@ const VideoCard: React.FC<VideoCardProps> = ({
     }
   };
 
-  // Update the progress bar based on the video current time
+  // Update the progress bar based on the video's current time
   const updateProgress = () => {
     if (videoRef.current) {
       const progressValue = (videoRef.current.currentTime / videoRef.current.duration) * 100;
@@ -138,11 +131,11 @@ const VideoCard: React.FC<VideoCardProps> = ({
         >
           {isMuted ? (
             <>
-              <path d="M12 3v18l-7-7h-4v-4h4l7-7z" /> {/* Speaker icon */}
-              <path d="M16 3l-6 6m0 0l-6-6m6 6l6 6" stroke="currentColor" /> {/* Slash icon */}
+              <path d="M12 3v18l-7-7h-4v-4h4l7-7z" />
+              <line x1="18" y1="6" x2="6" y2="18" />
             </>
           ) : (
-            <path d="M12 3v18l-7-7h-4v-4h4l7-7z" /> // Unmuted speaker icon
+            <path d="M12 3v18l-7-7h-4v-4h4l7-7z" />
           )}
         </svg>
       </div>
@@ -150,7 +143,7 @@ const VideoCard: React.FC<VideoCardProps> = ({
       {/* Button Section */}
       <div className="text-center">
         <button
-          onClick={handleButtonClick} // Handle button click with authentication check
+          onClick={handleButtonClick}
           className="px-4 py-2 border border-[#779ecb] text-[#779ecb] rounded-full hover:bg-[#779ecb] hover:text-white transition-colors"
         >
           {buttonText}

@@ -7,59 +7,72 @@ import VideoCard from "./components/VideoCard"; // Import VideoCard
 
 const HomePage: React.FC = () => {
   const [currentPlaying, setCurrentPlaying] = useState<string | null>(null);
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false); // State for authentication
+  const [user, setUser] = useState<any>(null); // State to hold user data
   const router = useRouter(); // Initialize useRouter for navigation
 
   useEffect(() => {
     const checkAuth = async () => {
-      const user = await supabase.auth.getUser(); // Get the current user from Supabase
-      setIsAuthenticated(user.data !== null); // Check if user is authenticated
+      const { data } = await supabase.auth.getSession();
+      setUser(data?.session?.user || null); // Set user state if authenticated
     };
+
     checkAuth();
+
+    const { data: authListener } = supabase.auth.onAuthStateChange(
+      (_event, session) => {
+        setUser(session?.user || null); // Update user state on auth changes
+      }
+    );
+
+    return () => {
+      authListener?.subscription?.unsubscribe();
+    };
   }, []);
 
   const handlePlayVideo = (videoId: string) => {
     setCurrentPlaying((prev) => (prev === videoId ? null : videoId));
   };
 
-  // Redirect to /Pages/Videos
-  const handleWatchVideosClick = () => {
-    if (!isAuthenticated) {
-      router.push("/Pages/login"); // Redirect to login page if not authenticated
-      return; // Stop further execution if not authenticated
+  // Redirect to login page if not authenticated
+  const requireAuth = (callback: () => void) => {
+    if (!user) {
+      router.push("/Pages/login");
+      return;
     }
-    router.push("/Pages/Videos"); // Redirect to the videos page if authenticated
+    callback();
   };
 
-  // Example button action for "Get Support"
+  // Example action for "Watch Videos"
+  const handleWatchVideosClick = () => {
+    requireAuth(() => router.push("/Pages/Subjects"));
+  };
+
+  // Example action for "Get Support"
   const handleGetSupportClick = () => {
-    if (!isAuthenticated) {
-      router.push("/Pages/login"); // Redirect to login page if not authenticated
-      return; // Stop further execution if not authenticated
-    }
-    router.push("/Pages/Support"); // Redirect to the support page if authenticated
+    requireAuth(() => router.push("/Pages/Support"));
   };
 
   return (
     <div>
       <main className="flex justify-center items-center p-4 bg-inherit">
-        {/* Flex container to arrange cards side by side */}
         <div className="flex space-x-4">
           <VideoCard
-            videoSrc="https://www.w3schools.com/html/movie.mp4" // Add your video URL
+            videoSrc="https://www.w3schools.com/html/movie.mp4"
             buttonText="Watch Videos"
-            buttonAction={handleWatchVideosClick} // Redirect to /Pages/Videos
-            videoId="video1" // Unique video ID for identification
+            buttonAction={handleWatchVideosClick}
+            videoId="video1"
             onPlay={handlePlayVideo}
             isPlaying={currentPlaying === "video1"}
+            user={user} // Pass user directly to VideoCard
           />
           <VideoCard
-            videoSrc="https://www.w3schools.com/html/movie.mp4" // Add your video URL
+            videoSrc="https://www.w3schools.com/html/movie.mp4"
             buttonText="Get Support"
-            buttonAction={handleGetSupportClick} // Placeholder for discussions
-            videoId="video2" // Unique video ID for identification
+            buttonAction={handleGetSupportClick}
+            videoId="video2"
             onPlay={handlePlayVideo}
             isPlaying={currentPlaying === "video2"}
+            user={user} // Pass user directly to VideoCard
           />
         </div>
       </main>

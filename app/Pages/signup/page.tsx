@@ -49,15 +49,32 @@ const Signup: React.FC = () => {
         return;
       }
 
-      // Log the user ID and username for debugging purposes
-      console.log("User ID:", user.id);
+      // Log the user UID and username for debugging purposes
+      console.log("User UID:", user.id);  // This is the Supabase user ID
       console.log("Username:", username);
 
+      // Insert the display name into the 'display_names' table using the correct column names
+      const { data: insertData, error: insertError } = await supabase
+        .from("display_names")
+        .upsert({
+          UID: user.id,         // Use "UID" for the user identifier
+          display_name: username // Use "display_name" for the display name
+        })
+        .eq("UID", user.id); // Ensure we update the correct user based on UID
+
+      if (insertError) {
+        setError(`Failed to update display name: ${insertError.message}`);
+        console.error("Insert Error:", insertError);  // Log detailed error
+        return;
+      }
+
+      console.log("Updated Display Name Data:", insertData);  // Log the successful update
+
       // Display success message
-      setSuccessMessage("User created successfully! Please verify your email.");
+      setSuccessMessage("User created successfully! Please verify your email and log in.");
 
     } catch (err) {
-      setError("An unexpected error occurred.");
+      setError(`An unexpected error occurred: ${err}`);
       console.error("Unexpected Error:", err);
     }
   };

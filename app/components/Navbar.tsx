@@ -5,60 +5,99 @@ import Link from "next/link";
 import { supabase } from "@/app/lib/lib/supabaseClient"; // Import supabase client
 import ThemeSwitch from "./ThemeSwitch";
 
-const Navbar: React.FC = () => {
-  const [language, setLanguage] = useState("en");
-  const [user, setUser] = useState<any>(null); // State to track the logged-in user
-  const googleTranslateElementRef = useRef<HTMLDivElement | null>(null); // Define the ref
-  const translateElementRef = useRef<any>(null); // Reference to the translate element instance
+interface NavbarProps {
+  setIsAuthenticated: (status: boolean) => void; // Accept setIsAuthenticated as a prop
+}
+
+const Navbar: React.FC<NavbarProps> = ({ setIsAuthenticated }) => {
+  const [user, setUser] = useState<any>(null);
+  const [userRole, setUserRole] = useState<string | null>(null); // To store user role
+  const [accessType, setAccessType] = useState<string | null>(null); // To store access type (normal/admin)
+  const [displayName, setDisplayName] = useState<string>("Profile"); // Store display name
+  const [isProfileOpen, setIsProfileOpen] = useState(false); // To handle profile dropdown
+  const googleTranslateElementRef = useRef<HTMLDivElement | null>(null);
+  const dropdownRef = useRef<HTMLDivElement | null>(null); // Ref for dropdown element
 
   useEffect(() => {
-    // Check user session on mount
-    const session = supabase.auth.getSession();
-    setUser(session?.user);
+    const checkSession = async () => {
+      const { data, error } = await supabase.auth.getSession();
+      if (data?.session) {
+        setUser(data.session.user);
+        setIsAuthenticated(true); // Set the authentication status to true
 
-    // Listen for changes in the user's authentication state
+        // Fetch user role from the database
+        const { data: userData, error: userError } = await supabase
+          .from("users") // Assuming the users table contains a `role` column
+          .select("role")
+          .eq("id", data.session.user.id)
+          .single();
+
+        if (userData) {
+          setUserRole(userData.role); // Set user role
+        }
+
+        // Fetch access type and display name from the 'display_names' table
+        const { data: displayData, error: displayError } = await supabase
+          .from("display_names")
+          .select("display_name, access_type")
+          .eq("UID", data.session.user.id)
+          .single();
+
+        if (displayError) {
+          console.error("Failed to fetch display name:", displayError);
+        } else {
+          setDisplayName(displayData?.display_name || "Profile"); // Set display name
+          setAccessType(displayData?.access_type || "normal"); // Set access type
+        }
+      } else {
+        setUser(null);
+        setUserRole(null);
+        setAccessType(null);
+        setIsAuthenticated(false); // Set the authentication status to false
+      }
+    };
+
+    checkSession();
+
     const { data: authListener } = supabase.auth.onAuthStateChange(
       (_event, session) => {
-        setUser(session?.user);
+        setUser(session?.user || null);
+        setIsAuthenticated(session?.user !== null); // Update the authentication status on auth state change
       }
     );
 
-    const loadGoogleTranslate = () => {
-      const script = document.createElement("script");
-      script.type = "text/javascript";
-      script.src =
-        "https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit";
-      script.onload = () => {
-        window.googleTranslateElementInit = () => {
-          const translateElement = new window.google.translate.TranslateElement(
-            {
-              pageLanguage: "en", // Default page language
-              includedLanguages: "kn,en", // Supported languages (Kannada and English)
-              layout:
-                window.google.translate.TranslateElement.InlineLayout.SIMPLE,
-              autoDisplay: false, // Don't automatically display the dropdown
-            },
-            googleTranslateElementRef.current // Use the ref here
-          );
+    return () => {
+      authListener?.subscription?.unsubscribe();
+    };
+  }, [setIsAuthenticated]);
 
-          // Store the translate element instance for later use
-          translateElementRef.current = translateElement;
-        };
-      };
-
-      document.body.appendChild(script); // Append the script to load it
+  useEffect(() => {
+    const handleOutsideClick = (event: MouseEvent) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
+        setIsProfileOpen(false);
+      }
     };
 
-    loadGoogleTranslate();
-
+    document.addEventListener("mousedown", handleOutsideClick);
     return () => {
-      authListener?.unsubscribe(); // Cleanup the listener
+      document.removeEventListener("mousedown", handleOutsideClick);
     };
   }, []);
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
-    setUser(null); // Reset user state after sign out
+    setUser(null);
+    setUserRole(null);
+    setAccessType(null);
+    setDisplayName("Profile"); // Reset the display name on sign-out
+    setIsAuthenticated(false); // Update authentication status on sign-out
+  };
+
+  const toggleProfileDropdown = () => {
+    setIsProfileOpen((prev) => !prev);
   };
 
   return (
@@ -72,7 +111,8 @@ const Navbar: React.FC = () => {
               className="h-5 w-5"
               fill="none"
               viewBox="0 0 24 24"
-              stroke="currentColor">
+              stroke="currentColor"
+            >
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -83,14 +123,15 @@ const Navbar: React.FC = () => {
           </div>
           <ul
             tabIndex={0}
-            className="menu menu-sm dropdown-content bg-base-100 rounded-box z-[60] mt-3 w-52 p-2 shadow">
+            className="menu menu-sm dropdown-content bg-base-100 rounded-box z-[60] mt-3 w-52 p-2 shadow"
+          >
             <li>
               <Link href="/">Home</Link>
             </li>
             {user && (
               <>
                 <li>
-                  <Link href="/Pages/Subjects">Subjects</Link>
+                  <Link href="/Pages/Subjects">Videos</Link>
                 </li>
                 <li>
                   <Link href="/Pages/Activities">Activities</Link>
@@ -98,6 +139,11 @@ const Navbar: React.FC = () => {
                 <li>
                   <Link href="/Pages/Support">Support</Link>
                 </li>
+                {accessType === "admin" && (
+                  <li>
+                    <Link href="/admin/actions">Admin Actions</Link>
+                  </li>
+                )}
               </>
             )}
           </ul>
@@ -116,7 +162,7 @@ const Navbar: React.FC = () => {
           {user && (
             <>
               <li>
-                <Link href="/Pages/Subjects">Subjects</Link>
+                <Link href="/Pages/Subjects">Videos</Link>
               </li>
               <li>
                 <Link href="/Pages/Activities">Activities</Link>
@@ -134,9 +180,28 @@ const Navbar: React.FC = () => {
         <ThemeSwitch /> {/* Always visible */}
         <div ref={googleTranslateElementRef}></div> {/* Always visible */}
         {user ? (
-          <button onClick={handleSignOut} className="btn btn-primary">
-            Sign Out
-          </button>
+          <div className="relative" ref={dropdownRef}>
+            <button onClick={toggleProfileDropdown} className="btn btn-primary">
+              {displayName}
+            </button>
+            {isProfileOpen && (
+              <ul className="dropdown-content bg-base-100 rounded-box shadow-lg mt-2 absolute right-0 w-48 p-4 border border-gray-300">
+                <li>
+                  <Link href="/profile/settings">Profile Settings</Link>
+                </li>
+                {accessType === "admin" && (
+                  <li>
+                    <Link href="/Pages/Admin">Admin Actions</Link>
+                  </li>
+                )}
+                <li>
+                  <button onClick={handleSignOut} className="w-full text-left">
+                    Sign Out
+                  </button>
+                </li>
+              </ul>
+            )}
+          </div>
         ) : (
           <Link href="/Pages/login" className="btn btn-primary">
             Login/Signup

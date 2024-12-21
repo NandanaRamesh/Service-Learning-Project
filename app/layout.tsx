@@ -1,8 +1,11 @@
-import type { Metadata } from "next";
+// layout.tsx (Client Component)
+"use client";  // This directive marks the component as a client component
+
+import { useState } from "react"; // Import useState to manage authentication state
 import localFont from "next/font/local";
-import "./globals.css";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
+import "./globals.css";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -15,21 +18,18 @@ const geistMono = localFont({
   weight: "100 900",
 });
 
-export const metadata: Metadata = {
-  title: "SVSST Educational Content Repository",
-  description: "Swami Vivekananda Social Service Trust",
-};
-
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false); // State to manage authentication status
+
   return (
     <html lang="en">
       <body className="min-h-screen flex flex-col antialiased bg-inherit">
-        {/* Navbar with ThemeSwitch */}
-        <Navbar />
+        {/* Pass setIsAuthenticated as a prop to Navbar */}
+        <Navbar setIsAuthenticated={setIsAuthenticated} />
         <main className="flex-grow bg-inherit color-inherit">{children}</main>
         {/* Footer */}
         <Footer />
