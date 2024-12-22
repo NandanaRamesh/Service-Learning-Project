@@ -57,10 +57,6 @@ const HomePage: React.FC = () => {
         setUser(session?.user || null); // Update user state on auth changes
       }
     );
-
-    return () => {
-      authListener?.unsubscribe();
-    };
   }, []);
 
   const handlePlayVideo = (videoId: string) => {
