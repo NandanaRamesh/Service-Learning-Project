@@ -6,6 +6,7 @@ const Login: React.FC = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [passwordVisible, setPasswordVisible] = useState(false); // State to toggle password visibility
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -42,18 +43,23 @@ const Login: React.FC = () => {
           />
           <div className="relative">
             <input
-              type="password"
+              type={passwordVisible ? "text" : "password"} // Toggle between text and password input types
               placeholder="Enter your password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="w-full px-4 py-2 rounded border border-gray-600 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
+            <button
+              type="button"
+              onClick={() => setPasswordVisible(!passwordVisible)} // Toggle password visibility
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500">
+              {passwordVisible ? "Hide" : "Show"}
+            </button>
           </div>
           {error && <p className="text-red-500">{error}</p>}
           <button
             type="submit"
-            className="w-full py-2 btn btn-primary text-white font-semibold rounded transition"
-          >
+            className="w-full py-2 btn btn-primary text-white font-semibold rounded transition">
             Log In
           </button>
         </form>
