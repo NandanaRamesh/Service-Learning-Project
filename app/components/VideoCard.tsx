@@ -30,7 +30,9 @@ const VideoCard: React.FC<VideoCardProps> = ({
   // Check user authentication status
   useEffect(() => {
     const checkAuth = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       setIsAuthenticated(!!user);
     };
     checkAuth();
@@ -47,7 +49,8 @@ const VideoCard: React.FC<VideoCardProps> = ({
   // Handle progress bar updates
   const handleProgressChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (videoRef.current) {
-      const newTime = (videoRef.current.duration * parseFloat(event.target.value)) / 100;
+      const newTime =
+        (videoRef.current.duration * parseFloat(event.target.value)) / 100;
       videoRef.current.currentTime = newTime;
       setProgress(parseFloat(event.target.value));
     }
@@ -56,7 +59,8 @@ const VideoCard: React.FC<VideoCardProps> = ({
   // Update the progress bar based on the video's current time
   const updateProgress = () => {
     if (videoRef.current) {
-      const progressValue = (videoRef.current.currentTime / videoRef.current.duration) * 100;
+      const progressValue =
+        (videoRef.current.currentTime / videoRef.current.duration) * 100;
       setProgress(progressValue);
     }
   };
@@ -93,7 +97,7 @@ const VideoCard: React.FC<VideoCardProps> = ({
   };
 
   return (
-    <div className="border p-4 rounded-lg shadow-lg max-w-xs">
+    <div className="border p-4 rounded-lg shadow-lg max-w-xs m-5">
       {/* Video Section */}
       <div className="relative cursor-pointer mb-4" onClick={handleClick}>
         <video
@@ -127,8 +131,7 @@ const VideoCard: React.FC<VideoCardProps> = ({
           strokeLinecap="round"
           strokeLinejoin="round"
           className="cursor-pointer w-6 h-6"
-          onClick={handleMute}
-        >
+          onClick={handleMute}>
           {isMuted ? (
             <>
               <path d="M12 3v18l-7-7h-4v-4h4l7-7z" />
@@ -144,8 +147,7 @@ const VideoCard: React.FC<VideoCardProps> = ({
       <div className="text-center">
         <button
           onClick={handleButtonClick}
-          className="px-4 py-2 border border-[#779ecb] text-[#779ecb] rounded-full hover:bg-[#779ecb] hover:text-white transition-colors"
-        >
+          className="px-4 py-2 border border-[#779ecb] text-[#779ecb] rounded-full hover:bg-[#779ecb] hover:text-white transition-colors">
           {buttonText}
         </button>
       </div>
