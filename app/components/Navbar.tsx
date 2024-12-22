@@ -15,9 +15,9 @@ const Navbar: React.FC<NavbarProps> = ({ setIsAuthenticated }) => {
   const [accessType, setAccessType] = useState<string | null>(null);
   const [displayName, setDisplayName] = useState<string>("Profile");
   const [isProfileOpen, setIsProfileOpen] = useState(false);
-  const googleTranslateElementLoaded = useRef(false);
   const googleTranslateElementRef = useRef<HTMLDivElement | null>(null);
   const dropdownRef = useRef<HTMLDivElement | null>(null);
+  const navbarRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     const checkSession = async () => {
@@ -83,31 +83,46 @@ const Navbar: React.FC<NavbarProps> = ({ setIsAuthenticated }) => {
   }, []);
 
   useEffect(() => {
-    if (!googleTranslateElementLoaded.current) {
-      const loadGoogleTranslate = () => {
-        const script = document.createElement("script");
-        script.type = "text/javascript";
-        script.src =
-          "https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit";
-        script.onload = () => {
-          window.googleTranslateElementInit = () => {
-            new window.google.translate.TranslateElement(
-              {
-                pageLanguage: "en",
-                includedLanguages: "kn,en",
-                layout: window.google.translate.TranslateElement.InlineLayout.SIMPLE,
-                autoDisplay: false,
-              },
-              googleTranslateElementRef.current
-            );
-          };
+    const loadGoogleTranslate = () => {
+      const script = document.createElement("script");
+      script.type = "text/javascript";
+      script.src =
+        "https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit";
+      script.onload = () => {
+        window.googleTranslateElementInit = () => {
+          new window.google.translate.TranslateElement(
+            {
+              pageLanguage: "en",
+              includedLanguages: "kn,en",
+              layout:
+                window.google.translate.TranslateElement.InlineLayout.SIMPLE,
+              autoDisplay: false,
+            },
+            googleTranslateElementRef.current
+          );
         };
-        document.body.appendChild(script);
       };
+      document.body.appendChild(script);
+    };
 
-      loadGoogleTranslate();
-      googleTranslateElementLoaded.current = true;
-    }
+    loadGoogleTranslate();
+
+    const adjustNavbarForTranslateBar = () => {
+      const translateBar = document.querySelector(".goog-te-banner-frame");
+      if (translateBar) {
+        const translateBarHeight = translateBar.getBoundingClientRect().height;
+        if (navbarRef.current) {
+          navbarRef.current.style.marginTop = `${translateBarHeight}px`;
+        }
+      } else if (navbarRef.current) {
+        navbarRef.current.style.marginTop = "0px";
+      }
+    };
+
+    const observer = new MutationObserver(adjustNavbarForTranslateBar);
+    observer.observe(document.body, { childList: true, subtree: true });
+
+    return () => observer.disconnect();
   }, []);
 
   const handleSignOut = async () => {
@@ -124,7 +139,7 @@ const Navbar: React.FC<NavbarProps> = ({ setIsAuthenticated }) => {
   };
 
   return (
-    <div className="navbar bg-base-100 relative z-50">
+    <div className="navbar bg-base-100" ref={navbarRef}>
       <div className="navbar-start">
         <div className="dropdown">
           <div tabIndex={0} role="button" className="btn btn-ghost lg:hidden">
@@ -133,8 +148,7 @@ const Navbar: React.FC<NavbarProps> = ({ setIsAuthenticated }) => {
               className="h-5 w-5"
               fill="none"
               viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
+              stroke="currentColor">
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -145,8 +159,7 @@ const Navbar: React.FC<NavbarProps> = ({ setIsAuthenticated }) => {
           </div>
           <ul
             tabIndex={0}
-            className="menu menu-sm dropdown-content bg-base-100 rounded-box z-[60] mt-3 w-52 p-2 shadow"
-          >
+            className="menu menu-sm dropdown-content bg-base-100 rounded-box z-[60] mt-3 w-52 p-2 shadow">
             <li>
               <Link href="/">Home</Link>
             </li>

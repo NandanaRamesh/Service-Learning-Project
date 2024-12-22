@@ -31,7 +31,7 @@ body {
 
 div {
   background-color: inherit; /* Ensures it inherits from body */
-  color: inherit;            /* Inherits text color */
+  color: inherit; /* Inherits text color */
 }
 
 hr {
@@ -58,7 +58,7 @@ hr {
   width: auto;
   height: auto;
   overflow: visible;
-  color: var(--text-color) !important; 
+  color: var(--text-color) !important;
 }
 
 /* Main Google Translate button style */
@@ -67,7 +67,9 @@ hr {
   border: none !important;
   font-family: inherit !important;
   font-size: 14px !important;
-  color: var(--text-color) !important; /* Text color is dynamic, based on theme */
+  color: var(
+    --text-color
+  ) !important; /* Text color is dynamic, based on theme */
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
@@ -77,12 +79,12 @@ hr {
 
 .goog-te-gadget-simple span {
   margin-right: 5px; /* Space between text */
-  color: var(--text-color) !important; 
+  color: var(--text-color) !important;
 }
 
 .goog-te-combo {
   background-color: var(--background) !important;
-  color: var(--text-color)!important; /* Text color for dropdown */
+  color: var(--text-color) !important; /* Text color for dropdown */
   border: none !important;
   border-radius: 4px !important;
   padding: 4px !important;
@@ -108,7 +110,7 @@ hr {
 
 /* Hover effect on the selected language */
 .goog-te-gadget-simple .goog-te-menu-value:hover {
-  color: var(--text-color) !important; 
+  color: var(--text-color) !important;
 }
 
 /* Removing the Google icon */
@@ -119,10 +121,10 @@ hr {
 /* For Google Translate banner (if shown) */
 .goog-te-banner-frame.skiptranslate {
   display: none !important;
-  color: var(--text-color) !important; 
+  color: var(--text-color) !important;
 }
 
-/* Ensure consistent body styling */
+/* Ensure consistent body styling
 body {
   top: 0 !important;
-}
+} */
