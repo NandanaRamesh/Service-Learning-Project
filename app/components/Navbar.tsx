@@ -2,11 +2,11 @@
 
 import React, { useEffect, useState, useRef } from "react";
 import Link from "next/link";
-import { supabase } from "@/app/lib/lib/supabaseClient"; // Import supabase client
+import { supabase } from "@/app/lib/lib/supabaseClient";
 import ThemeSwitch from "./ThemeSwitch";
 
 interface NavbarProps {
-  setIsAuthenticated: (status: boolean) => void; // Accept setIsAuthenticated as a prop
+  setIsAuthenticated: (status: boolean) => void;
 }
 
 const Navbar: React.FC<NavbarProps> = ({ setIsAuthenticated }) => {
@@ -15,6 +15,7 @@ const Navbar: React.FC<NavbarProps> = ({ setIsAuthenticated }) => {
   const [accessType, setAccessType] = useState<string | null>(null);
   const [displayName, setDisplayName] = useState<string>("Profile");
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const googleTranslateElementLoaded = useRef(false);
   const googleTranslateElementRef = useRef<HTMLDivElement | null>(null);
   const dropdownRef = useRef<HTMLDivElement | null>(null);
 
@@ -82,28 +83,31 @@ const Navbar: React.FC<NavbarProps> = ({ setIsAuthenticated }) => {
   }, []);
 
   useEffect(() => {
-    const loadGoogleTranslate = () => {
-      const script = document.createElement("script");
-      script.type = "text/javascript";
-      script.src =
-        "https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit";
-      script.onload = () => {
-        window.googleTranslateElementInit = () => {
-          new window.google.translate.TranslateElement(
-            {
-              pageLanguage: "en",
-              includedLanguages: "kn,en",
-              layout: window.google.translate.TranslateElement.InlineLayout.SIMPLE,
-              autoDisplay: false,
-            },
-            googleTranslateElementRef.current
-          );
+    if (!googleTranslateElementLoaded.current) {
+      const loadGoogleTranslate = () => {
+        const script = document.createElement("script");
+        script.type = "text/javascript";
+        script.src =
+          "https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit";
+        script.onload = () => {
+          window.googleTranslateElementInit = () => {
+            new window.google.translate.TranslateElement(
+              {
+                pageLanguage: "en",
+                includedLanguages: "kn,en",
+                layout: window.google.translate.TranslateElement.InlineLayout.SIMPLE,
+                autoDisplay: false,
+              },
+              googleTranslateElementRef.current
+            );
+          };
         };
+        document.body.appendChild(script);
       };
-      document.body.appendChild(script);
-    };
 
-    loadGoogleTranslate();
+      loadGoogleTranslate();
+      googleTranslateElementLoaded.current = true;
+    }
   }, []);
 
   const handleSignOut = async () => {
