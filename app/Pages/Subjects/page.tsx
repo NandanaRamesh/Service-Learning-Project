@@ -3,6 +3,8 @@
 import React, { useState, useEffect } from "react";
 import { fetchVideosBySubject, searchVideosBySubject, fetchVideosByGrade, searchVideosByGrade } from "@/app/lib/lib/videosSubject";
 import { useSearchParams, useRouter } from "next/navigation";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faPlay } from '@fortawesome/free-solid-svg-icons';
 
 interface Video {
   video_id: string;
@@ -11,21 +13,21 @@ interface Video {
   source_url: string;
   tags: string;
   subject_id: string;
-  grade_id: string; // Add grade_id to video interface
+  grade_id: string;
 }
 
 const SubjectsPage: React.FC = () => {
   const searchParams = useSearchParams();
   const router = useRouter();
 
-  const initialSubject = searchParams.get("subject") || "S0001"; // Default to "Math" (S0001)
-  const initialGrade = searchParams.get("grade") || "G0014"; // Default grade
+  const initialSubject = searchParams.get("subject") || "S0001";
+  const initialGrade = searchParams.get("grade") || "G0014";
 
   const [selectedSubject, setSelectedSubject] = useState<string>(initialSubject);
   const [selectedGrade, setSelectedGrade] = useState<string>(initialGrade);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [videos, setVideos] = useState<Video[]>([]);
-  const [filterType, setFilterType] = useState<"subject" | "grade">("subject"); // Track which filter is active
+  const [filterType, setFilterType] = useState<"subject" | "grade">("subject");
 
   const subjects = [
     { label: "Math", id: "S0001" },
@@ -55,7 +57,6 @@ const SubjectsPage: React.FC = () => {
         }
       } else if (filterType === "grade") {
         if (searchQuery) {
-          // Implement search for grade-specific videos here
           const searchResults = await searchVideosByGrade(selectedGrade, searchQuery);
           setVideos(searchResults);
         } else {
@@ -70,14 +71,19 @@ const SubjectsPage: React.FC = () => {
 
   const handleSubjectChange = (subjectId: string) => {
     setSelectedSubject(subjectId);
-    setFilterType("subject"); // Switch to subject filter
+    setFilterType("subject");
     router.push(`/Pages/Subjects?subject=${subjectId}`);
   };
 
   const handleGradeChange = (gradeId: string) => {
     setSelectedGrade(gradeId);
-    setFilterType("grade"); // Switch to grade filter
+    setFilterType("grade");
     router.push(`/Pages/Subjects?grade=${gradeId}`);
+  };
+
+  const handlePlayVideo = (videoUrl: string) => {
+    // Navigate to the VideoPlayerPage with the video URL as a query parameter
+    router.push(`/Pages/VideoPlayer?pageUrl=${encodeURIComponent(videoUrl)}`);
   };
 
   return (
@@ -160,14 +166,12 @@ const SubjectsPage: React.FC = () => {
                 <div className="w-full h-32 bg-white flex items-center justify-center rounded">
                   <p className="text-lg font-semibold text-center">{video.title}</p>
                 </div>
-                <a
-                  href={video.source_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-block mt-2 text-blue-400 hover:text-blue-300 underline"
+                <button
+                  onClick={() => handlePlayVideo(video.source_url)} // Use the new navigation logic
+                  className="inline-block mt-2 text-blue-400 hover:text-blue-300 underline flex items-center"
                 >
-                  Watch Video
-                </a>
+                  <FontAwesomeIcon icon={faPlay} className="mr-2" /> Watch Video
+                </button>
               </div>
             ))
           ) : (

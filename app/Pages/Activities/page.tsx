@@ -2,6 +2,8 @@
 
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation"; // Import useRouter from Next.js
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faPlay } from '@fortawesome/free-solid-svg-icons';
 import { supabase } from "@/app/lib/lib/supabaseClient"; // Adjust according to your supabase client import
 
 interface Activities {
@@ -65,6 +67,11 @@ const ActivitiesPage: React.FC = () => {
     router.push(`/Pages/Activities?tab=${categoryId}`);
   };
 
+  // Handle redirection to VideoPlayer page
+  const handleWatchVideo = (source: string) => {
+    router.push(`/Pages/VideoPlayer?pageUrl=${encodeURIComponent(source)}`);
+  };
+  
   return (
     <div className="flex min-h-screen">
       {/* Sidebar */}
@@ -113,15 +120,12 @@ const ActivitiesPage: React.FC = () => {
                 <div className="w-full h-32 bg-white flex items-center justify-center rounded">
                   <p className="text-lg font-semibold text-center">{activity.activity_name}</p>
                 </div>
-                <p className="mt-2 text-gray-700">{activity.description}</p>
-                <a
-                  href={activity.source}
-                  className="mt-4 text-blue-500 hover:text-blue-700"
-                  target="_blank"
-                  rel="noopener noreferrer"
+                <button
+                  onClick={() => handleWatchVideo(activity.source)} // Use the new navigation logic
+                  className="inline-block mt-2 text-blue-400 hover:text-blue-300 underline flex items-center"
                 >
-                  Visit Source
-                </a>
+                  <FontAwesomeIcon icon={faPlay} className="mr-2" /> Watch Video
+                </button>
               </div>
             ))
           ) : (
