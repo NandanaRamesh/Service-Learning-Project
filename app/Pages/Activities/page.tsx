@@ -14,7 +14,7 @@ interface Activities {
 const ActivitiesPage: React.FC = () => {
   const router = useRouter();
   const searchParams = new URLSearchParams(window.location.search);
-  const initialTab = searchParams.get("tab") || "crafts"; // Default to "crafts"
+  const initialTab = searchParams.get("tab") || "ACT001"; // Default to "crafts"
   const [selectedCategory, setSelectedCategory] = useState<string>(initialTab);
   const [searchQuery, setSearchQuery] = useState<string>(""); // Search query state
   const [activities, setActivities] = useState<Activities[]>([]); // All activities fetched from Supabase
