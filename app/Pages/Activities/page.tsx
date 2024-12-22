@@ -1,43 +1,65 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { useSearchParams, useRouter } from "next/navigation";
-import { activitiesData } from "@/app/components/activitiesData";
+import { useRouter } from "next/navigation"; // Import useRouter from Next.js
+import { supabase } from "@/app/lib/lib/supabaseClient"; // Adjust according to your supabase client import
 
-interface Activity {
-  id: string;
-  title: string;
+interface Activities {
+  activity_id: string;
+  activity_name: string;
   description: string;
-  imageUrl?: string;
+  source: string; // URL for the activity source
 }
 
 const ActivitiesPage: React.FC = () => {
-  const searchParams = useSearchParams();
   const router = useRouter();
-
-  const initialTab = searchParams.get("tab") || "crafts";
+  const searchParams = new URLSearchParams(window.location.search);
+  const initialTab = searchParams.get("tab") || "crafts"; // Default to "crafts"
   const [selectedCategory, setSelectedCategory] = useState<string>(initialTab);
-  const [searchQuery, setSearchQuery] = useState<string>("");
-  const [filteredActivities, setFilteredActivities] = useState<Activity[]>([]);
+  const [searchQuery, setSearchQuery] = useState<string>(""); // Search query state
+  const [activities, setActivities] = useState<Activities[]>([]); // All activities fetched from Supabase
+  const [filteredActivities, setFilteredActivities] = useState<Activities[]>([]); // Filtered activities based on search and category
 
   const categories = [
-    { label: "Crafts", id: "crafts" },
-    { label: "Arts", id: "arts" },
-    { label: "Games", id: "games" },
-    { label: "Edutainment", id: "edutainment" },
+    { label: "Crafts", id: "ACT001" },
+    { label: "Arts", id: "ACT002" },
+    { label: "Games", id: "ACT003" },
+    { label: "Edutainment", id: "ACT004" },
   ];
 
+  // Fetch activities from Supabase based on category
   useEffect(() => {
-    const activitiesList = activitiesData[selectedCategory] || [];
-    const results = searchQuery
-      ? activitiesList.filter((activity) =>
-          activity.title.toLowerCase().includes(searchQuery.toLowerCase())
-        )
-      : activitiesList;
+    const fetchActivities = async () => {
+      console.log("Fetching activities for category:", selectedCategory); // Log selected category
 
-    setFilteredActivities(results);
-  }, [selectedCategory, searchQuery]);
+      const { data, error } = await supabase
+        .from("Activities") // Assuming the table name is 'Activities'
+        .select("*")
+        .eq("activity_type_id", selectedCategory)
+        .order("activity_name", { ascending: true });
 
+      if (error) {
+        console.error("Error fetching activities:", error);
+      } else {
+        console.log("Fetched activities:", data); // Log fetched activities
+        setActivities(data); // Set activities state
+      }
+    };
+
+    fetchActivities();
+  }, [selectedCategory]); // Fetch activities when the selected category changes
+
+  // Filter activities based on the search query
+  useEffect(() => {
+    console.log("All Activities:", activities); // Log all activities
+    const results = activities.filter((activity) =>
+      activity.activity_name.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+    console.log("Filtered Activities:", results); // Log filtered activities
+    setFilteredActivities(results); // Update filtered activities
+  }, [searchQuery, activities]); // Re-filter when search query or activities change
+
+  // Handle category change
   const handleCategoryChange = (categoryId: string) => {
     setSelectedCategory(categoryId);
     router.push(`/Pages/Activities?tab=${categoryId}`);
@@ -53,10 +75,8 @@ const ActivitiesPage: React.FC = () => {
             <li key={category.id}>
               <button
                 onClick={() => handleCategoryChange(category.id)}
-                className={`w-full px-4 py-2 text-left rounded border border-gray-400 hover:bg-opacity-80 ${
-                  selectedCategory === category.id
-                    ? "bg-blue-500 text-white"
-                    : "bg-transparent text-inherit"
+                className={`w-full px-4 py-2 text-left rounded border border-gray-400 hover:bg-blue-500 ${
+                  selectedCategory === category.id ? "bg-inherit text-inherit" : "bg-inherit text-inherit"
                 }`}
               >
                 {category.label}
@@ -71,9 +91,7 @@ const ActivitiesPage: React.FC = () => {
         <h1 className="text-3xl font-bold mb-6">
           {searchQuery
             ? `Search Results for "${searchQuery}"`
-            : `Activities for ${
-                categories.find((c) => c.id === selectedCategory)?.label
-              }`}
+            : `Activities for ${categories.find((c) => c.id === selectedCategory)?.label}`}
         </h1>
 
         {/* Search Bar */}
@@ -91,24 +109,19 @@ const ActivitiesPage: React.FC = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {filteredActivities.length > 0 ? (
             filteredActivities.map((activity) => (
-              <div
-                key={activity.id}
-                className="p-4 rounded shadow hover:shadow-lg transition"
-              >
-                {activity.imageUrl ? (
-                  <img
-                    src={activity.imageUrl}
-                    alt={activity.title}
-                    className="w-full h-32 object-cover rounded"
-                  />
-                ) : (
-                  <div className="w-full h-32 bg-gray-200 flex items-center justify-center rounded">
-                    <p className="text-lg font-semibold text-center">
-                      {activity.title}
-                    </p>
-                  </div>
-                )}
+              <div key={activity.activity_id} className="p-4 rounded shadow hover:shadow-lg transition">
+                <div className="w-full h-32 bg-white flex items-center justify-center rounded">
+                  <p className="text-lg font-semibold text-center">{activity.activity_name}</p>
+                </div>
                 <p className="mt-2 text-gray-700">{activity.description}</p>
+                <a
+                  href={activity.source}
+                  className="mt-4 text-blue-500 hover:text-blue-700"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Visit Source
+                </a>
               </div>
             ))
           ) : (
