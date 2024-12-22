@@ -11,49 +11,43 @@ interface NavbarProps {
 
 const Navbar: React.FC<NavbarProps> = ({ setIsAuthenticated }) => {
   const [user, setUser] = useState<any>(null);
-  const [userRole, setUserRole] = useState<string | null>(null); // To store user role
-  const [accessType, setAccessType] = useState<string | null>(null); // To store access type (normal/admin)
-  const [displayName, setDisplayName] = useState<string>("Profile"); // Store display name
-  const [isProfileOpen, setIsProfileOpen] = useState(false); // To handle profile dropdown
+  const [userRole, setUserRole] = useState<string | null>(null);
+  const [accessType, setAccessType] = useState<string | null>(null);
+  const [displayName, setDisplayName] = useState<string>("Profile");
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
   const googleTranslateElementRef = useRef<HTMLDivElement | null>(null);
-  const dropdownRef = useRef<HTMLDivElement | null>(null); // Ref for dropdown element
+  const dropdownRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     const checkSession = async () => {
       const { data, error } = await supabase.auth.getSession();
       if (data?.session) {
         setUser(data.session.user);
-        setIsAuthenticated(true); // Set the authentication status to true
+        setIsAuthenticated(true);
 
-        // Fetch user role from the database
-        const { data: userData, error: userError } = await supabase
-          .from("users") // Assuming the users table contains a `role` column
+        const { data: userData } = await supabase
+          .from("users")
           .select("role")
           .eq("id", data.session.user.id)
           .single();
-
         if (userData) {
-          setUserRole(userData.role); // Set user role
+          setUserRole(userData.role);
         }
 
-        // Fetch access type and display name from the 'display_names' table
-        const { data: displayData, error: displayError } = await supabase
+        const { data: displayData } = await supabase
           .from("display_names")
           .select("display_name, access_type")
           .eq("UID", data.session.user.id)
           .single();
-
-        if (displayError) {
-          console.error("Failed to fetch display name:", displayError);
-        } else {
-          setDisplayName(displayData?.display_name || "Profile"); // Set display name
-          setAccessType(displayData?.access_type || "normal"); // Set access type
+        if (displayData) {
+          setDisplayName(displayData.display_name || "Profile");
+          setAccessType(displayData.access_type || "normal");
         }
       } else {
         setUser(null);
         setUserRole(null);
         setAccessType(null);
-        setIsAuthenticated(false); // Set the authentication status to false
+        setIsAuthenticated(false);
       }
     };
 
@@ -62,7 +56,7 @@ const Navbar: React.FC<NavbarProps> = ({ setIsAuthenticated }) => {
     const { data: authListener } = supabase.auth.onAuthStateChange(
       (_event, session) => {
         setUser(session?.user || null);
-        setIsAuthenticated(session?.user !== null); // Update the authentication status on auth state change
+        setIsAuthenticated(session?.user !== null);
       }
     );
 
@@ -87,13 +81,38 @@ const Navbar: React.FC<NavbarProps> = ({ setIsAuthenticated }) => {
     };
   }, []);
 
+  useEffect(() => {
+    const loadGoogleTranslate = () => {
+      const script = document.createElement("script");
+      script.type = "text/javascript";
+      script.src =
+        "https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit";
+      script.onload = () => {
+        window.googleTranslateElementInit = () => {
+          new window.google.translate.TranslateElement(
+            {
+              pageLanguage: "en",
+              includedLanguages: "kn,en",
+              layout: window.google.translate.TranslateElement.InlineLayout.SIMPLE,
+              autoDisplay: false,
+            },
+            googleTranslateElementRef.current
+          );
+        };
+      };
+      document.body.appendChild(script);
+    };
+
+    loadGoogleTranslate();
+  }, []);
+
   const handleSignOut = async () => {
     await supabase.auth.signOut();
     setUser(null);
     setUserRole(null);
     setAccessType(null);
-    setDisplayName("Profile"); // Reset the display name on sign-out
-    setIsAuthenticated(false); // Update authentication status on sign-out
+    setDisplayName("Profile");
+    setIsAuthenticated(false);
   };
 
   const toggleProfileDropdown = () => {
@@ -102,7 +121,6 @@ const Navbar: React.FC<NavbarProps> = ({ setIsAuthenticated }) => {
 
   return (
     <div className="navbar bg-base-100 relative z-50">
-      {/* Mobile View */}
       <div className="navbar-start">
         <div className="dropdown">
           <div tabIndex={0} role="button" className="btn btn-ghost lg:hidden">
@@ -153,7 +171,6 @@ const Navbar: React.FC<NavbarProps> = ({ setIsAuthenticated }) => {
         </Link>
       </div>
 
-      {/* Desktop View */}
       <div className="navbar-center hidden lg:flex">
         <ul className="menu menu-horizontal px-1 space-x-4">
           <li>
@@ -175,10 +192,9 @@ const Navbar: React.FC<NavbarProps> = ({ setIsAuthenticated }) => {
         </ul>
       </div>
 
-      {/* Right Side */}
       <div className="navbar-end flex items-center space-x-4">
-        <ThemeSwitch /> {/* Always visible */}
-        <div ref={googleTranslateElementRef}></div> {/* Always visible */}
+        <ThemeSwitch />
+        <div ref={googleTranslateElementRef}></div>
         {user ? (
           <div className="relative" ref={dropdownRef}>
             <button onClick={toggleProfileDropdown} className="btn btn-primary">
