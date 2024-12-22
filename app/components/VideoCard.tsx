@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { supabase } from "@/app/lib/lib/supabaseClient";
 
 interface VideoCardProps {
-  videoSrc: string;
+  videoSrc: string | undefined;
   buttonText: string;
   buttonAction: () => void;
   videoId: string;
