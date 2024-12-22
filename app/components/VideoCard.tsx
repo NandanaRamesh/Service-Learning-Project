@@ -1,8 +1,13 @@
 "use client";
 
 import React, { useRef, useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { supabase } from "@/app/lib/lib/supabaseClient";
+import styles from "@/app/styles/VideoCard.module.css";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faVolumeMute,
+  faVolumeUp,
+  faExpand,
+} from "@fortawesome/free-solid-svg-icons";
 
 interface VideoCardProps {
   videoSrc: string | undefined;
@@ -24,21 +29,8 @@ const VideoCard: React.FC<VideoCardProps> = ({
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const [isMuted, setIsMuted] = useState(false);
   const [progress, setProgress] = useState(0);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const router = useRouter();
 
-  // Check user authentication status
-  useEffect(() => {
-    const checkAuth = async () => {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      setIsAuthenticated(!!user);
-    };
-    checkAuth();
-  }, []);
-
-  // Toggle mute/unmute state
+  // Toggle mute/unmute
   const handleMute = () => {
     if (videoRef.current) {
       videoRef.current.muted = !isMuted;
@@ -46,7 +38,7 @@ const VideoCard: React.FC<VideoCardProps> = ({
     }
   };
 
-  // Handle progress bar updates
+  // Handle progress bar changes
   const handleProgressChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (videoRef.current) {
       const newTime =
@@ -56,7 +48,7 @@ const VideoCard: React.FC<VideoCardProps> = ({
     }
   };
 
-  // Update the progress bar based on the video's current time
+  // Update the progress bar
   const updateProgress = () => {
     if (videoRef.current) {
       const progressValue =
@@ -65,13 +57,13 @@ const VideoCard: React.FC<VideoCardProps> = ({
     }
   };
 
-  // Update the progress every second
+  // Interval for updating the progress bar
   useEffect(() => {
     const interval = setInterval(updateProgress, 1000);
-    return () => clearInterval(interval); // Clean up interval on component unmount
+    return () => clearInterval(interval);
   }, []);
 
-  // Play/Pause video based on isPlaying state
+  // Handle play/pause for the video
   useEffect(() => {
     if (videoRef.current) {
       if (isPlaying) {
@@ -82,35 +74,50 @@ const VideoCard: React.FC<VideoCardProps> = ({
     }
   }, [isPlaying]);
 
-  // Handle video play/pause on video click
-  const handleClick = () => {
-    onPlay(videoId);
-  };
-
-  // Handle button action, checking for authentication first
-  const handleButtonClick = () => {
-    if (!isAuthenticated) {
-      router.push("/Pages/login"); // Redirect to login if not authenticated
-    } else {
-      buttonAction(); // Proceed with the button action if authenticated
+  // Handle fullscreen
+  const handleFullScreen = () => {
+    if (videoRef.current) {
+      if (videoRef.current.requestFullscreen) {
+        videoRef.current.requestFullscreen();
+      } else if ((videoRef.current as any).webkitRequestFullscreen) {
+        (videoRef.current as any).webkitRequestFullscreen(); // Safari
+      } else if ((videoRef.current as any).mozRequestFullScreen) {
+        (videoRef.current as any).mozRequestFullScreen(); // Firefox
+      } else if ((videoRef.current as any).msRequestFullscreen) {
+        (videoRef.current as any).msRequestFullscreen(); // IE/Edge
+      }
     }
   };
 
   return (
-    <div className="border p-4 rounded-lg shadow-lg max-w-xs m-5">
+    <div
+      className="border p-4 rounded-lg shadow-lg m-5"
+      style={{ maxWidth: "100%" }}>
       {/* Video Section */}
-      <div className="relative cursor-pointer mb-4" onClick={handleClick}>
+      <div
+        className="relative mb-4"
+        style={{
+          aspectRatio: "16/9", // Adjust to match the video ratio
+          width: "100%", // Width dynamically adjusts to aspect ratio
+          height: "200px", // Fixed height
+        }}>
         <video
           ref={videoRef}
           src={videoSrc}
-          className="w-full h-56 object-cover rounded-lg"
+          className="w-full h-full object-contain rounded-lg"
           muted={isMuted}
+          onClick={() => onPlay(videoId)}
         />
+        {/* Fullscreen Icon */}
+        <button
+          className="absolute bottom-2 right-2 bg-black bg-opacity-50 p-2 rounded-full text-white"
+          onClick={handleFullScreen}>
+          <FontAwesomeIcon icon={faExpand} />
+        </button>
       </div>
 
       {/* Custom Video Controls */}
       <div className="flex items-center justify-between space-x-2 mb-4">
-        {/* Progress Bar */}
         <input
           type="range"
           value={progress}
@@ -118,35 +125,15 @@ const VideoCard: React.FC<VideoCardProps> = ({
           max="100"
           className="w-full"
         />
-
-        {/* Mute/Unmute Icon */}
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="24"
-          height="24"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          className="cursor-pointer w-6 h-6"
-          onClick={handleMute}>
-          {isMuted ? (
-            <>
-              <path d="M12 3v18l-7-7h-4v-4h4l7-7z" />
-              <line x1="18" y1="6" x2="6" y2="18" />
-            </>
-          ) : (
-            <path d="M12 3v18l-7-7h-4v-4h4l7-7z" />
-          )}
-        </svg>
+        <button onClick={handleMute}>
+          <FontAwesomeIcon icon={isMuted ? faVolumeMute : faVolumeUp} />
+        </button>
       </div>
 
       {/* Button Section */}
       <div className="text-center">
         <button
-          onClick={handleButtonClick}
+          onClick={buttonAction}
           className="px-4 py-2 border border-[#779ecb] text-[#779ecb] rounded-full hover:bg-[#779ecb] hover:text-white transition-colors">
           {buttonText}
         </button>

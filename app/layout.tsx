@@ -1,11 +1,12 @@
 // layout.tsx (Client Component)
-"use client";  // This directive marks the component as a client component
+"use client"; // This directive marks the component as a client component
 
 import { useState } from "react"; // Import useState to manage authentication state
 import localFont from "next/font/local";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import "./globals.css";
+import FontAwesomeConfig from "./fontawesome";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -27,6 +28,9 @@ export default function RootLayout({
 
   return (
     <html lang="en">
+      <head>
+        <FontAwesomeConfig />
+      </head>
       <body className="min-h-screen flex flex-col antialiased bg-inherit">
         {/* Pass setIsAuthenticated as a prop to Navbar */}
         <Navbar setIsAuthenticated={setIsAuthenticated} />

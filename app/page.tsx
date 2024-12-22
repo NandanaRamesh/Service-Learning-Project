@@ -1,25 +1,26 @@
-"use client";
+"use client"; // Add this line at the top of the file
 
 import React, { useState, useEffect } from "react";
-import { useRouter } from "next/navigation"; // Import useRouter from Next.js
-import { supabase } from "@/app/lib/lib/supabaseClient"; // Adjust according to your supabase client import
-import VideoCard from "./components/VideoCard"; // Import VideoCard
+import { useRouter } from "next/navigation";
+import { supabase } from "@/app/lib/lib/supabaseClient";
+import VideoCard from "./components/VideoCard";
+import LoadingSpinner from "./components/LoadingSpinner"; // Import the spinner
 
 const HomePage: React.FC = () => {
   const [currentPlaying, setCurrentPlaying] = useState<string | null>(null);
-  const [user, setUser] = useState<any>(null); // State to hold user data
-  const [videoUrl, setVideoUrl] = useState<string | null>(null); // State to hold video URL
-  const [loading, setLoading] = useState<boolean>(true); // Loading state for video
-  const router = useRouter(); // Initialize useRouter for navigation
+  const [user, setUser] = useState<any>(null);
+  const [videoUrl, setVideoUrl] = useState<string | null>(null);
+  const [loading, setLoading] = useState<boolean>(true); // Loading state
+  const router = useRouter();
 
+  // Fetch the first video URL
   useEffect(() => {
-    // Fetch the URL for the first video
     const fetchFirstVideoUrl = async () => {
       try {
-        console.log("Fetching video URL...");
+        setLoading(true); // Set loading to true before fetching
         const { data: signedUrlData, error } = await supabase.storage
-          .from("VideoCard") // Correct bucket name
-          .createSignedUrl("VideoCard_Videos/videoCard_videos.mp4", 3600); // Path to the video
+          .from("VideoCard")
+          .createSignedUrl("VideoCard_Videos/videoCard_videos.mp4", 3600);
 
         if (error || !signedUrlData) {
           console.error(
@@ -28,33 +29,30 @@ const HomePage: React.FC = () => {
           );
           setVideoUrl(null);
         } else {
-          console.log(
-            "Signed URL fetched successfully:",
-            signedUrlData.signedUrl
-          );
           setVideoUrl(signedUrlData.signedUrl);
         }
       } catch (err) {
         console.error("Unexpected error:", err);
       } finally {
-        setLoading(false);
+        setLoading(false); // Set loading to false after URL is fetched or error occurs
       }
     };
 
     fetchFirstVideoUrl();
-  }, []);
+  }, []); // Empty dependency array ensures it only runs once on mount
 
+  // Fetch user session
   useEffect(() => {
     const checkAuth = async () => {
       const { data } = await supabase.auth.getSession();
-      setUser(data?.session?.user || null); // Set user state if authenticated
+      setUser(data?.session?.user || null);
     };
 
     checkAuth();
 
     const { data: authListener } = supabase.auth.onAuthStateChange(
       (_event, session) => {
-        setUser(session?.user || null); // Update user state on auth changes
+        setUser(session?.user || null);
       }
     );
   }, []);
@@ -63,7 +61,6 @@ const HomePage: React.FC = () => {
     setCurrentPlaying((prev) => (prev === videoId ? null : videoId));
   };
 
-  // Redirect to login page if not authenticated
   const requireAuth = (callback: () => void) => {
     if (!user) {
       alert("You need to log in first!");
@@ -73,12 +70,10 @@ const HomePage: React.FC = () => {
     callback();
   };
 
-  // Example action for "Watch Videos"
   const handleWatchVideosClick = () => {
     requireAuth(() => router.push("/Pages/Subjects"));
   };
 
-  // Example action for "Get Support"
   const handleGetSupportClick = () => {
     requireAuth(() => router.push("/Pages/Support"));
   };
@@ -88,7 +83,9 @@ const HomePage: React.FC = () => {
       <main className="flex flex-col md:flex-row justify-center items-center p-4 bg-inherit">
         <div className="flex flex-col space-y-4 md:space-x-4">
           {loading ? (
-            <p>Loading video, please wait...</p> // Placeholder while video URL is being fetched
+            <div className="w-300 h-300 rounded-lg shadow-lg flex justify-center items-center">
+              <LoadingSpinner /> {/* Display loading spinner */}
+            </div>
           ) : videoUrl ? (
             <VideoCard
               videoSrc={videoUrl}
@@ -97,7 +94,6 @@ const HomePage: React.FC = () => {
               videoId="video1"
               onPlay={handlePlayVideo}
               isPlaying={currentPlaying === "video1"}
-              user={user} // Pass user directly to VideoCard
             />
           ) : (
             <p>Error loading video. Please try again later.</p>
@@ -111,7 +107,6 @@ const HomePage: React.FC = () => {
             videoId="video2"
             onPlay={handlePlayVideo}
             isPlaying={currentPlaying === "video2"}
-            user={user} // Pass user directly to VideoCard
           />
         </div>
       </main>
