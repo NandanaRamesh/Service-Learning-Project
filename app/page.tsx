@@ -9,37 +9,54 @@ import LoadingSpinner from "./components/LoadingSpinner"; // Import the spinner
 const HomePage: React.FC = () => {
   const [currentPlaying, setCurrentPlaying] = useState<string | null>(null);
   const [user, setUser] = useState<any>(null);
-  const [videoUrl, setVideoUrl] = useState<string | null>(null);
-  const [loading, setLoading] = useState<boolean>(true); // Loading state
+  const [videoUrls, setVideoUrls] = useState<{ [key: string]: string | null }>({
+    firstVideo: null,
+    secondVideo: null,
+  });
+  const [loading, setLoading] = useState<{ [key: string]: boolean }>({
+    firstVideo: true,
+    secondVideo: true,
+  });
   const router = useRouter();
 
-  // Fetch the first video URL
+  // Fetch video URLs
   useEffect(() => {
-    const fetchFirstVideoUrl = async () => {
+    const fetchVideoUrls = async () => {
       try {
-        setLoading(true); // Set loading to true before fetching
-        const { data: signedUrlData, error } = await supabase.storage
-          .from("VideoCard")
-          .createSignedUrl("VideoCard_Videos/videoCard_videos.mp4", 3600);
+        setLoading((prev) => ({ ...prev, firstVideo: true }));
+        const { data: firstVideoData, error: firstVideoError } =
+          await supabase.storage
+            .from("VideoCard")
+            .createSignedUrl("VideoCard_Videos/videoCard_videos.mp4", 3600);
 
-        if (error || !signedUrlData) {
-          console.error(
-            "Error generating signed URL:",
-            error?.message || "No data returned"
-          );
-          setVideoUrl(null);
-        } else {
-          setVideoUrl(signedUrlData.signedUrl);
-        }
+        setVideoUrls((prev) => ({
+          ...prev,
+          firstVideo: firstVideoError
+            ? null
+            : firstVideoData?.signedUrl || null,
+        }));
+
+        setLoading((prev) => ({ ...prev, secondVideo: true }));
+        const { data: secondVideoData, error: secondVideoError } =
+          await supabase.storage
+            .from("VideoCard")
+            .createSignedUrl("VideoCard_Videos/videoCard_support.mp4", 3600);
+
+        setVideoUrls((prev) => ({
+          ...prev,
+          secondVideo: secondVideoError
+            ? null
+            : secondVideoData?.signedUrl || null,
+        }));
       } catch (err) {
         console.error("Unexpected error:", err);
       } finally {
-        setLoading(false); // Set loading to false after URL is fetched or error occurs
+        setLoading((prev) => ({ firstVideo: false, secondVideo: false }));
       }
     };
 
-    fetchFirstVideoUrl();
-  }, []); // Empty dependency array ensures it only runs once on mount
+    fetchVideoUrls();
+  }, []);
 
   // Fetch user session
   useEffect(() => {
@@ -82,13 +99,13 @@ const HomePage: React.FC = () => {
     <div>
       <main className="flex flex-col md:flex-row justify-center items-center p-4 bg-inherit">
         <div className="flex flex-col space-y-4 md:space-x-4">
-          {loading ? (
+          {loading.firstVideo ? (
             <div className="w-300 h-300 rounded-lg shadow-lg flex justify-center items-center">
               <LoadingSpinner /> {/* Display loading spinner */}
             </div>
-          ) : videoUrl ? (
+          ) : videoUrls.firstVideo ? (
             <VideoCard
-              videoSrc={videoUrl}
+              videoSrc={videoUrls.firstVideo}
               buttonText="Watch Videos"
               buttonAction={handleWatchVideosClick}
               videoId="video1"
@@ -100,14 +117,22 @@ const HomePage: React.FC = () => {
           )}
         </div>
         <div className="flex flex-col space-y-4">
-          <VideoCard
-            videoSrc="https://www.w3schools.com/html/movie.mp4"
-            buttonText="Get Support"
-            buttonAction={handleGetSupportClick}
-            videoId="video2"
-            onPlay={handlePlayVideo}
-            isPlaying={currentPlaying === "video2"}
-          />
+          {loading.secondVideo ? (
+            <div className="w-300 h-300 rounded-lg shadow-lg flex justify-center items-center">
+              <LoadingSpinner /> {/* Display loading spinner */}
+            </div>
+          ) : videoUrls.secondVideo ? (
+            <VideoCard
+              videoSrc={videoUrls.secondVideo}
+              buttonText="Get Support"
+              buttonAction={handleGetSupportClick}
+              videoId="video2"
+              onPlay={handlePlayVideo}
+              isPlaying={currentPlaying === "video2"}
+            />
+          ) : (
+            <p>Error loading video. Please try again later.</p>
+          )}
         </div>
       </main>
     </div>
