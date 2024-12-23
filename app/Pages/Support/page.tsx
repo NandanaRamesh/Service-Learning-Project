@@ -34,7 +34,9 @@ const SupportPage: React.FC = () => {
 
       const { data, error } = await supabase
         .from("Tickets")
-        .select("ticket_id, user_id, ticket_type_id, description, status_id, created, updated, priority_id, attachments, due_date")
+        .select(
+          "ticket_id, user_id, ticket_type_id, description, status_id, created, updated, priority_id, attachments, due_date"
+        )
         .eq("user_id", user.data.user.id) // Filter tickets by logged-in user's ID
         .order("created", { ascending: false });
 
@@ -66,8 +68,7 @@ const SupportPage: React.FC = () => {
         <h1 className="text-3xl font-bold">Support Tickets</h1>
         <button
           className="mt-4 mb-4 px-4 py-2 bg-blue-500 text-white font-semibold rounded hover:bg-blue-600"
-          onClick={() => setShowCreateTicket(true)}
-        >
+          onClick={() => setShowCreateTicket(true)}>
           Create Ticket
         </button>
       </div>
@@ -86,44 +87,71 @@ const SupportPage: React.FC = () => {
         <table className="table-auto w-full border-collapse border border-gray-400">
           <thead>
             <tr className="bg-inherit">
-              <th className="border border-gray-400 px-4 py-2 text-left">Ticket ID</th>
-              <th className="border border-gray-400 px-4 py-2 text-left">Type</th>
-              <th className="border border-gray-400 px-4 py-2 text-left">Date Raised</th>
-              <th className="border border-gray-400 px-4 py-2 text-left">Due Date</th>
-              <th className="border border-gray-400 px-4 py-2 text-left">Description</th>
-              <th className="border border-gray-400 px-4 py-2 text-left">Attachments</th>
-              <th className="border border-gray-400 px-4 py-2 text-left">Date Resolved</th>
+              <th className="border border-gray-400 px-4 py-2 text-left">
+                Ticket ID
+              </th>
+              <th className="border border-gray-400 px-4 py-2 text-left">
+                Type
+              </th>
+              <th className="border border-gray-400 px-4 py-2 text-left">
+                Date Raised
+              </th>
+              <th className="border border-gray-400 px-4 py-2 text-left">
+                Due Date
+              </th>
+              <th className="border border-gray-400 px-4 py-2 text-left">
+                Description
+              </th>
+              <th className="border border-gray-400 px-4 py-2 text-left">
+                Attachments
+              </th>
+              <th className="border border-gray-400 px-4 py-2 text-left">
+                Date Resolved
+              </th>
             </tr>
           </thead>
           <tbody>
             {filteredTickets.length > 0 ? (
               filteredTickets.map((ticket) => (
                 <tr key={ticket.ticket_id}>
-                  <td className="border border-gray-400 px-4 py-2">{ticket.ticket_id}</td>
-                  <td className="border border-gray-400 px-4 py-2">{ticket.ticket_type_id}</td>
-                  <td className="border border-gray-400 px-4 py-2">{ticket.created}</td>
-                  <td className="border border-gray-400 px-4 py-2">{ticket.due_date || "N/A"}</td>
-                  <td className="border border-gray-400 px-4 py-2">{ticket.description}</td>
+                  <td className="border border-gray-400 px-4 py-2">
+                    {ticket.ticket_id}
+                  </td>
+                  <td className="border border-gray-400 px-4 py-2">
+                    {ticket.ticket_type_id}
+                  </td>
+                  <td className="border border-gray-400 px-4 py-2">
+                    {ticket.created}
+                  </td>
+                  <td className="border border-gray-400 px-4 py-2">
+                    {ticket.due_date || "N/A"}
+                  </td>
+                  <td className="border border-gray-400 px-4 py-2">
+                    {ticket.description}
+                  </td>
                   <td className="border border-gray-400 px-4 py-2">
                     {ticket.attachments ? (
                       <a
                         href={ticket.attachments}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-blue-400 hover:underline"
-                      >
+                        className="text-blue-400 hover:underline">
                         View
                       </a>
                     ) : (
                       "None"
                     )}
                   </td>
-                  <td className="border border-gray-400 px-4 py-2">{ticket.updated || "Pending"}</td>
+                  <td className="border border-gray-400 px-4 py-2">
+                    {ticket.updated || "Pending"}
+                  </td>
                 </tr>
               ))
             ) : (
               <tr>
-                <td colSpan={7} className="border border-gray-400 px-4 py-2 text-center">
+                <td
+                  colSpan={7}
+                  className="border border-gray-400 px-4 py-2 text-center">
                   No tickets found.
                 </td>
               </tr>
@@ -180,15 +208,13 @@ const CreateTicketPage: React.FC<{ onCancel: () => void }> = ({ onCancel }) => {
       <h2 className="text-2xl font-bold mb-4">Create Ticket</h2>
       <form
         className="w-full max-w-lg p-6 rounded shadow-md"
-        onSubmit={handleSubmit}
-      >
+        onSubmit={handleSubmit}>
         <div className="mb-4">
           <label className="block text-sm font-bold mb-2">Type</label>
           <select
             value={type}
             onChange={(e) => setType(e.target.value)}
-            className="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
+            className="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
             <option>Educational Content</option>
             <option>Technical</option>
             <option>General</option>
@@ -200,8 +226,7 @@ const CreateTicketPage: React.FC<{ onCancel: () => void }> = ({ onCancel }) => {
           <select
             value={priority}
             onChange={(e) => setPriority(e.target.value)}
-            className="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
+            className="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
             <option>Low</option>
             <option>Medium</option>
             <option>High</option>
@@ -232,7 +257,9 @@ const CreateTicketPage: React.FC<{ onCancel: () => void }> = ({ onCancel }) => {
           <label className="block text-sm font-bold mb-2">Attachments</label>
           <input
             type="file"
-            onChange={(e) => setAttachments(e.target.files ? e.target.files[0] : null)}
+            onChange={(e) =>
+              setAttachments(e.target.files ? e.target.files[0] : null)
+            }
             className="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
@@ -241,14 +268,12 @@ const CreateTicketPage: React.FC<{ onCancel: () => void }> = ({ onCancel }) => {
           <button
             type="button"
             className="bg-inherit text-inherit border px-4 py-2 rounded hover:bg-blue-600"
-            onClick={onCancel}
-          >
+            onClick={onCancel}>
             Cancel
           </button>
           <button
             type="submit"
-            className="bg-inherit text-inherit border px-4 py-2 rounded hover:bg-blue-600"
-          >
+            className="bg-inherit text-inherit border px-4 py-2 rounded hover:bg-blue-600">
             Submit
           </button>
         </div>

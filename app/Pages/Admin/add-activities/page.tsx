@@ -12,6 +12,7 @@ const AddActivities: React.FC = () => {
     ageGroup: "",
     activityUrl: "",
   });
+  const [showAlert, setShowAlert] = useState(false);
 
   const handleChange = (
     e: React.ChangeEvent<
@@ -33,8 +34,10 @@ const AddActivities: React.FC = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     console.log("Form Data Submitted:", formData);
-    alert("Activity submitted successfully!");
+    setShowAlert(true); // Show custom alert
   };
+
+  const closeAlert = () => setShowAlert(false);
 
   return (
     <div className="p-6 min-h-screen">
@@ -130,6 +133,25 @@ const AddActivities: React.FC = () => {
           Submit Activity
         </button>
       </form>
+
+      {/* Custom Alert */}
+      {showAlert && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
+          <div className="bg-white p-6 rounded-lg shadow-lg text-center">
+            <h2 className="text-xl font-bold mb-4 text-green-500">
+              Activity Submitted!
+            </h2>
+            <p className="text-gray-700 mb-4">
+              Your activity has been successfully submitted.
+            </p>
+            <button
+              onClick={closeAlert}
+              className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600">
+              OK
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Back to Admin Button */}
       <div className="mt-6">

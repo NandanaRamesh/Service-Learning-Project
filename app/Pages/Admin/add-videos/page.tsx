@@ -14,6 +14,9 @@ const AddVideos: React.FC = () => {
     videoUrl: "",
   });
 
+  const [modalOpen, setModalOpen] = useState(false); // Modal State
+  const [successModalOpen, setSuccessModalOpen] = useState(false); // Success Modal State
+
   const handleChange = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
@@ -29,12 +32,68 @@ const AddVideos: React.FC = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Form Data Submitted:", formData);
-    alert("Video submitted successfully!");
+    setModalOpen(true); // Open confirmation modal
   };
+
+  const confirmSubmission = () => {
+    console.log("Form Data Submitted:", formData);
+    setModalOpen(false); // Close confirmation modal
+    setSuccessModalOpen(true); // Open success modal
+  };
+
+  const cancelSubmission = () => {
+    setModalOpen(false); // Close modal without submitting
+  };
+
+  const closeSuccessModal = () => {
+    setSuccessModalOpen(false); // Close success modal
+  };
+
+  // Confirmation Modal Component
+  const ConfirmationModal = () => (
+    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+      <div className="bg-white p-6 rounded shadow-lg w-4/5 max-w-md">
+        <h2 className="text-xl font-bold mb-4">Confirm Submission</h2>
+        <p>Are you sure you want to submit this video?</p>
+        <div className="flex justify-end space-x-2 mt-4">
+          <button
+            className="px-4 py-2 bg-gray-300 text-black rounded hover:bg-gray-400"
+            onClick={cancelSubmission}>
+            Cancel
+          </button>
+          <button
+            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+            onClick={confirmSubmission}>
+            Confirm
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+
+  // Success Modal Component
+  const SuccessModal = () => (
+    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+      <div className="bg-white p-6 rounded shadow-lg w-4/5 max-w-md">
+        <h2 className="text-xl font-bold mb-4 text-green-600">Success!</h2>
+        <p>Video submitted successfully!</p>
+        <div className="flex justify-center mt-4">
+          <button
+            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+            onClick={closeSuccessModal}>
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+  );
 
   return (
     <div className="p-6 min-h-screen">
+      {/* Modals */}
+      {modalOpen && <ConfirmationModal />}
+      {successModalOpen && <SuccessModal />}
+
       <h1 className="text-3xl font-bold mb-6">Add New Video</h1>
       <form
         onSubmit={handleSubmit}
@@ -61,13 +120,13 @@ const AddVideos: React.FC = () => {
             className="w-full p-2 border rounded"
             required>
             <option value="">Select Subject</option>
-            <option value="English Grammar">Maths</option>
+            <option value="Maths">Maths</option>
             <option value="Science">Science</option>
-            <option value="Basic Maths">English</option>
-            <option value="Facts">Physics</option>
-            <option value="Facts">Chemistry</option>
-            <option value="Facts">Biology</option>
-            <option value="Facts">GS & ES</option>
+            <option value="English">English</option>
+            <option value="Physics">Physics</option>
+            <option value="Chemistry">Chemistry</option>
+            <option value="Biology">Biology</option>
+            <option value="GS & ES">GS & ES</option>
           </select>
         </div>
 
@@ -80,9 +139,9 @@ const AddVideos: React.FC = () => {
             className="w-full p-2 border rounded"
             required>
             <option value="">Select Grade</option>
-            <option value="1-3">1-4</option>
-            <option value="4-6">5-7</option>
-            <option value="9-10">8-10</option>
+            <option value="1-4">1-4</option>
+            <option value="5-7">5-7</option>
+            <option value="8-10">8-10</option>
           </select>
         </div>
 
