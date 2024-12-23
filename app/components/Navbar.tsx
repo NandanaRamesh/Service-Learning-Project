@@ -4,17 +4,20 @@ import React, { useEffect, useState, useRef } from "react";
 import Link from "next/link";
 import { supabase } from "@/app/lib/lib/supabaseClient";
 import ThemeSwitch from "./ThemeSwitch";
+import { useRouter } from "next/navigation";
 
 interface NavbarProps {
   setIsAuthenticated: (status: boolean) => void;
 }
 
 const Navbar: React.FC<NavbarProps> = ({ setIsAuthenticated }) => {
+  const router = useRouter();
   const [user, setUser] = useState<any>(null);
   const [userRole, setUserRole] = useState<string | null>(null);
   const [accessType, setAccessType] = useState<string | null>(null);
   const [displayName, setDisplayName] = useState<string>("Profile");
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false); // State for logout modal
   const googleTranslateElementRef = useRef<HTMLDivElement | null>(null);
   const dropdownRef = useRef<HTMLDivElement | null>(null);
   const navbarRef = useRef<HTMLDivElement | null>(null);
@@ -125,13 +128,10 @@ const Navbar: React.FC<NavbarProps> = ({ setIsAuthenticated }) => {
     return () => observer.disconnect();
   }, []);
 
-  const handleSignOut = async () => {
+  const handleLogout = async () => {
     await supabase.auth.signOut();
-    setUser(null);
-    setUserRole(null);
-    setAccessType(null);
-    setDisplayName("Profile");
-    setIsAuthenticated(false);
+    setIsLogoutModalOpen(false); // Close modal after logout
+    router.push("/");
   };
 
   const toggleProfileDropdown = () => {
@@ -228,7 +228,9 @@ const Navbar: React.FC<NavbarProps> = ({ setIsAuthenticated }) => {
                   </li>
                 )}
                 <li>
-                  <button onClick={handleSignOut} className="w-full text-left">
+                  <button
+                    onClick={() => setIsLogoutModalOpen(true)}
+                    className="w-full text-left">
                     Sign Out
                   </button>
                 </li>
@@ -241,6 +243,28 @@ const Navbar: React.FC<NavbarProps> = ({ setIsAuthenticated }) => {
           </Link>
         )}
       </div>
+
+      {/* Logout Confirmation Modal */}
+      {isLogoutModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="w-96 rounded-lg bg-base-100 p-6 shadow-lg">
+            <h2 className="text-lg font-bold">Confirm Logout</h2>
+            <p className="mt-2 text-gray-400">
+              Are you sure you want to sign out?
+            </p>
+            <div className="mt-4 flex justify-end space-x-4">
+              <button
+                onClick={() => setIsLogoutModalOpen(false)}
+                className="btn">
+                Cancel
+              </button>
+              <button onClick={handleLogout} className="btn btn-primary">
+                Logout
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

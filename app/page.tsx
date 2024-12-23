@@ -100,7 +100,7 @@ const HomePage: React.FC = () => {
       <main className="flex flex-col md:flex-row justify-center items-center p-4 bg-inherit">
         <div className="flex flex-col space-y-4 md:space-x-4">
           {loading.firstVideo ? (
-            <div className="w-300 h-300 rounded-lg shadow-lg flex justify-center items-center">
+            <div className="w-300 h-300 rounded-lg shadow-lg flex justify-center items-center m-5">
               <LoadingSpinner /> {/* Display loading spinner */}
             </div>
           ) : videoUrls.firstVideo ? (
