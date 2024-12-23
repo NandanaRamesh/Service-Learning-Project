@@ -2,6 +2,12 @@
 
 import React from "react";
 import Link from "next/link";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faVideo,
+  faPuzzlePiece,
+  faTicketAlt,
+} from "@fortawesome/free-solid-svg-icons";
 
 const AdminPage: React.FC = () => {
   return (
@@ -16,6 +22,7 @@ const AdminPage: React.FC = () => {
           href="/Pages/Admin/add-videos"
           bgColor="bg-blue-500"
           hoverColor="hover:bg-blue-600"
+          icon={faVideo}
         />
         <Card
           title="Add Activities"
@@ -24,6 +31,7 @@ const AdminPage: React.FC = () => {
           href="/Pages/Admin/add-activities"
           bgColor="bg-yellow-500"
           hoverColor="hover:bg-yellow-600"
+          icon={faPuzzlePiece}
         />
         <Card
           title="Resolve Tickets"
@@ -32,6 +40,7 @@ const AdminPage: React.FC = () => {
           href="/Pages/Admin/resolve-ticket"
           bgColor="bg-red-500"
           hoverColor="hover:bg-red-600"
+          icon={faTicketAlt}
         />
       </div>
     </div>
@@ -45,6 +54,7 @@ interface CardProps {
   href: string;
   bgColor: string;
   hoverColor: string;
+  icon: any;
 }
 
 const Card: React.FC<CardProps> = ({
@@ -54,8 +64,10 @@ const Card: React.FC<CardProps> = ({
   href,
   bgColor,
   hoverColor,
+  icon,
 }) => (
   <div className="flex flex-col items-center p-6 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300">
+    <FontAwesomeIcon icon={icon} className="text-4xl mb-4 text-gray-600" />
     <h2 className="text-2xl font-bold mb-2">{title}</h2>
     <p className="text-gray-600 mb-4 text-center">{description}</p>
     <Link href={href}>
