@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
+import { supabase } from "@/app/lib/lib/supabaseClient";
 
 const AddVideos: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -10,35 +11,91 @@ const AddVideos: React.FC = () => {
     grade: "",
     description: "",
     tags: "",
-    thumbnail: null,
     videoUrl: "",
   });
 
-  const [modalOpen, setModalOpen] = useState(false); // Modal State
+  const [modalOpen, setModalOpen] = useState(false); // Confirmation Modal State
   const [successModalOpen, setSuccessModalOpen] = useState(false); // Success Modal State
+  const [error, setError] = useState(""); // Error Message State
 
   const handleChange = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
     >
   ) => {
-    const { name, value, files } = e.target;
-    if (files) {
-      setFormData({ ...formData, [name]: files[0] });
-    } else {
-      setFormData({ ...formData, [name]: value });
-    }
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Check for empty required fields
+    if (!formData.title || !formData.subject || !formData.videoUrl) {
+      setError("Please fill out all required fields.");
+      return;
+    }
+
+    setError("");
     setModalOpen(true); // Open confirmation modal
   };
 
-  const confirmSubmission = () => {
-    console.log("Form Data Submitted:", formData);
-    setModalOpen(false); // Close confirmation modal
-    setSuccessModalOpen(true); // Open success modal
+  const confirmSubmission = async () => {
+    try {
+      // Get the latest video ID
+      const { data: lastVideo, error: fetchError } = await supabase
+        .from("Video Data")
+        .select("video_id")
+        .order("video_id", { ascending: false })
+        .limit(1)
+        .single();
+
+      if (fetchError) throw fetchError;
+
+      const lastVideoId = lastVideo?.video_id || "V00000";
+      const newVideoId = `V${(parseInt(lastVideoId.slice(1)) + 1)
+        .toString()
+        .padStart(5, "0")}`;
+
+      // Map subject and grade to their corresponding codes
+      const subjectCodes: { [key: string]: string } = {
+        Maths: "S0001",
+        Science: "S0002",
+        English: "S0003",
+        Physics: "S0004",
+        Chemistry: "S0005",
+        Biology: "S0006",
+        "GS & ES": "S0007",
+      };
+
+      const gradeCodes: { [key: string]: string } = {
+        "1-4": "G0014",
+        "5-7": "G0057",
+        "8-10": "G0810",
+      };
+
+      const subjectId = subjectCodes[formData.subject] || null;
+      const gradeId = gradeCodes[formData.grade] || null;
+
+      // Insert data into Supabase table
+      const { error: insertError } = await supabase.from("Video Data").insert({
+        video_id: newVideoId,
+        title: formData.title,
+        description: formData.description,
+        source_url: formData.videoUrl,
+        subject_id: subjectId,
+        grade_id: gradeId,
+        tags: formData.tags,
+      });
+
+      if (insertError) throw insertError;
+
+      setModalOpen(false); // Close confirmation modal
+      setSuccessModalOpen(true); // Open success modal
+    } catch (err: any) {
+      setError(err.message || "An error occurred while submitting the video.");
+      setModalOpen(false);
+    }
   };
 
   const cancelSubmission = () => {
@@ -95,6 +152,9 @@ const AddVideos: React.FC = () => {
       {successModalOpen && <SuccessModal />}
 
       <h1 className="text-3xl font-bold mb-6">Add New Video</h1>
+      {error && (
+        <p className="text-red-600 font-semibold mb-4">{error}</p>
+      )}
       <form
         onSubmit={handleSubmit}
         className="p-6 rounded-lg shadow-md flex flex-col gap-4">
@@ -132,12 +192,11 @@ const AddVideos: React.FC = () => {
 
         {/* Grade */}
         <div>
-          <label className="block font-semibold mb-1">Grade</label>
+          <label className="block font-semibold mb-1">Grade (Optional)</label>
           <select
             name="grade"
             onChange={handleChange}
-            className="w-full p-2 border rounded"
-            required>
+            className="w-full p-2 border rounded">
             <option value="">Select Grade</option>
             <option value="1-4">1-4</option>
             <option value="5-7">5-7</option>
@@ -163,18 +222,6 @@ const AddVideos: React.FC = () => {
             type="text"
             name="tags"
             placeholder="Enter tags separated by commas"
-            onChange={handleChange}
-            className="w-full p-2 border rounded"
-          />
-        </div>
-
-        {/* Video Thumbnail */}
-        <div>
-          <label className="block font-semibold mb-1">Video Thumbnail</label>
-          <input
-            type="file"
-            name="thumbnail"
-            accept="image/*"
             onChange={handleChange}
             className="w-full p-2 border rounded"
           />

@@ -22,6 +22,7 @@ const SupportPage: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [showCreateTicket, setShowCreateTicket] = useState<boolean>(false);
   const [tickets, setTickets] = useState<Ticket[]>([]);
+  const [signedUrls, setSignedUrls] = useState<{ [key: string]: string }>({}); // To store signed URLs
 
   useEffect(() => {
     const fetchTickets = async () => {
@@ -37,7 +38,7 @@ const SupportPage: React.FC = () => {
         .select(
           "ticket_id, user_id, ticket_type_id, description, status_id, created, updated, priority_id, attachments, due_date"
         )
-        .eq("user_id", user.data.user.id) // Filter tickets by logged-in user's ID
+        .eq("user_id", user.data.user.id)
         .order("created", { ascending: false });
 
       if (error) {
@@ -58,6 +59,23 @@ const SupportPage: React.FC = () => {
       ticket.description.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  const handleViewAttachment = async (ticket_id: string, attachment: string) => {
+    const { data, error } = await supabase.storage
+      .from("Attachments")
+      .createSignedUrl(attachment, 60); // Signed URL expires in 60 seconds
+
+    if (error) {
+      console.error("Error generating signed URL:", error);
+      return;
+    }
+
+    // Update the signed URL for the ticket
+    setSignedUrls((prev) => ({
+      ...prev,
+      [ticket_id]: data?.signedUrl || "",
+    }));
+  };
+
   if (showCreateTicket) {
     return <CreateTicketPage onCancel={() => setShowCreateTicket(false)} />;
   }
@@ -68,7 +86,8 @@ const SupportPage: React.FC = () => {
         <h1 className="text-3xl font-bold">Support Tickets</h1>
         <button
           className="mt-4 mb-4 px-4 py-2 bg-blue-500 text-white font-semibold rounded hover:bg-blue-600"
-          onClick={() => setShowCreateTicket(true)}>
+          onClick={() => setShowCreateTicket(true)}
+        >
           Create Ticket
         </button>
       </div>
@@ -131,13 +150,26 @@ const SupportPage: React.FC = () => {
                   </td>
                   <td className="border border-gray-400 px-4 py-2">
                     {ticket.attachments ? (
-                      <a
-                        href={ticket.attachments}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-blue-400 hover:underline">
-                        View
-                      </a>
+                      <>
+                        <button
+                          onClick={() =>
+                            handleViewAttachment(ticket.ticket_id, ticket.attachments)
+                          }
+                          className="text-blue-400 hover:underline"
+                        >
+                          View
+                        </button>
+                        {signedUrls[ticket.ticket_id] && (
+                          <a
+                            href={signedUrls[ticket.ticket_id]}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-blue-400 hover:underline ml-2"
+                          >
+                            Open Attachment
+                          </a>
+                        )}
+                      </>
                     ) : (
                       "None"
                     )}
@@ -151,7 +183,8 @@ const SupportPage: React.FC = () => {
               <tr>
                 <td
                   colSpan={7}
-                  className="border border-gray-400 px-4 py-2 text-center">
+                  className="border border-gray-400 px-4 py-2 text-center"
+                >
                   No tickets found.
                 </td>
               </tr>
@@ -182,18 +215,33 @@ const CreateTicketPage: React.FC<{ onCancel: () => void }> = ({ onCancel }) => {
 
     const ticket_id = `TICKET_${Date.now()}`;
 
-    const { error } = await supabase.from("Tickets").insert([
-      {
-        ticket_id,
-        user_id: user.data.user.id,
-        ticket_type_id: type,
-        priority_id: priority,
-        due_date,
-        description,
-        attachments: attachments ? URL.createObjectURL(attachments) : null,
-        created: new Date().toISOString(),
-      },
-    ]);
+    let attachmentUrl = null;
+
+    if (attachments) {
+      // Upload attachment to the folder named after ticket_id
+      const { data, error } = await supabase.storage
+        .from("Attachments")
+        .upload(`${ticket_id}/${attachments.name}`, attachments);
+
+      if (error) {
+        console.error("Error uploading attachment:", error);
+        return;
+      }
+
+      // Store the path (ticket_id/attachmentname) in the database
+      attachmentUrl = `${ticket_id}/${attachments.name}`; // Store path in database
+    }
+
+    const { error } = await supabase.from("Tickets").insert([{
+      ticket_id,
+      user_id: user.data.user.id,
+      ticket_type_id: type,
+      priority_id: priority,
+      due_date,
+      description,
+      attachments: attachmentUrl, // Store the full path
+      created: new Date().toISOString(),
+    }]);
 
     if (error) {
       console.error("Error creating ticket:", error);
@@ -208,72 +256,70 @@ const CreateTicketPage: React.FC<{ onCancel: () => void }> = ({ onCancel }) => {
       <h2 className="text-2xl font-bold mb-4">Create Ticket</h2>
       <form
         className="w-full max-w-lg p-6 rounded shadow-md"
-        onSubmit={handleSubmit}>
+        onSubmit={handleSubmit}
+      >
         <div className="mb-4">
           <label className="block text-sm font-bold mb-2">Type</label>
           <select
             value={type}
             onChange={(e) => setType(e.target.value)}
-            className="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
-            <option>Educational Content</option>
-            <option>Technical</option>
-            <option>General</option>
+            className="w-full px-4 py-2 border border-gray-600 rounded"
+          >
+            <option value="Educational Content">Educational Content</option>
+            <option value="Technical Issue">Technical Issue</option>
+            <option value="Other">General</option>
           </select>
         </div>
-
         <div className="mb-4">
           <label className="block text-sm font-bold mb-2">Priority</label>
           <select
             value={priority}
             onChange={(e) => setPriority(e.target.value)}
-            className="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
-            <option>Low</option>
-            <option>Medium</option>
-            <option>High</option>
+            className="w-full px-4 py-2 border border-gray-600 rounded"
+          >
+            <option value="Low">Low</option>
+            <option value="Medium">Medium</option>
+            <option value="High">High</option>
           </select>
         </div>
-
         <div className="mb-4">
           <label className="block text-sm font-bold mb-2">Due Date</label>
           <input
             type="date"
             value={due_date}
             onChange={(e) => setDueDate(e.target.value)}
-            className="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-4 py-2 border border-gray-600 rounded"
           />
         </div>
-
         <div className="mb-4">
           <label className="block text-sm font-bold mb-2">Description</label>
           <textarea
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            className="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
             rows={4}
+            className="w-full px-4 py-2 border border-gray-600 rounded"
           />
         </div>
-
         <div className="mb-4">
-          <label className="block text-sm font-bold mb-2">Attachments</label>
+          <label className="block text-sm font-bold mb-2">Attachment</label>
           <input
             type="file"
-            onChange={(e) =>
-              setAttachments(e.target.files ? e.target.files[0] : null)
-            }
-            className="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+            onChange={(e) => e.target.files && setAttachments(e.target.files[0])}
+            className="w-full px-4 py-2 border border-gray-600 rounded"
           />
         </div>
-
-        <div className="flex justify-between mt-4">
+        <div className="flex justify-between">
           <button
             type="button"
-            className="bg-inherit text-inherit border px-4 py-2 rounded hover:bg-blue-600"
-            onClick={onCancel}>
+            onClick={onCancel}
+            className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
+          >
             Cancel
           </button>
           <button
             type="submit"
-            className="bg-inherit text-inherit border px-4 py-2 rounded hover:bg-blue-600">
+            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+          >
             Submit
           </button>
         </div>
