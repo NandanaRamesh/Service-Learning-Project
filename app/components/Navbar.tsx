@@ -220,7 +220,7 @@ const Navbar: React.FC<NavbarProps> = ({ setIsAuthenticated }) => {
             {isProfileOpen && (
               <ul className="dropdown-content bg-base-100 rounded-box shadow-lg mt-2 absolute right-0 w-48 p-4 border border-gray-300">
                 <li>
-                  <Link href="/profile/settings">Profile Settings</Link>
+                  <Link href="/Pages/ProfileSettings">Profile Settings</Link>
                 </li>
                 {accessType === "admin" && (
                   <li>
