@@ -16,21 +16,26 @@ type Ticket = {
 
 const ResolveTicketPage: React.FC = () => {
   const [tickets, setTickets] = useState<Ticket[]>([]);
-  const [sortOrder, setSortOrder] = useState<"high" | "medium" | "low" | null>(
-    null
-  );
+  const [priorityFilter, setPriorityFilter] = useState<"high" | "medium" | "low" | "all">("all");
+  const [typeFilter, setTypeFilter] = useState<string | "all">("all");
+  const [signedUrls, setSignedUrls] = useState<{ [key: number]: string }>({});
 
   useEffect(() => {
     fetchTickets();
-  }, [sortOrder]);
+  }, [priorityFilter, typeFilter]);
 
   const fetchTickets = async () => {
     let query = supabase.from("Tickets").select(
       "ticket_id, ticket_type_id, created, updated, priority_id, attachments, status_id"
     );
 
-    if (sortOrder) {
-      query = query.order("priority_id", { ascending: sortOrder === "low" });
+    // Apply filters based on selected priority and type
+    if (priorityFilter !== "all") {
+      query = query.eq("priority_id", priorityFilter);
+    }
+
+    if (typeFilter !== "all") {
+      query = query.eq("ticket_type_id", typeFilter);
     }
 
     const { data, error } = await query;
@@ -54,6 +59,22 @@ const ResolveTicketPage: React.FC = () => {
     }
   };
 
+  const generateSignedUrl = async (ticketId: string, attachmentName: string) => {
+    const { data, error } = await supabase
+      .storage
+      .from("Attachments")
+      .createSignedUrl(`${ticketId}/${attachmentName}`, 60);  // Valid for 1 minute
+
+    if (error) {
+      console.error("Error generating signed URL:", error);
+    } else if (data) {
+      setSignedUrls(prev => ({
+        ...prev,
+        [ticketId]: data.signedUrl,  // Store the signed URL by ticketId
+      }));
+    }
+  };
+
   return (
     <div className="flex flex-col min-h-screen bg-inherit text-inherit p-6">
       {/* Header */}
@@ -61,21 +82,38 @@ const ResolveTicketPage: React.FC = () => {
         <h1 className="text-3xl font-bold">Tickets</h1>
       </div>
 
-      {/* Priority Sorting */}
-      <div className="mb-4">
-        <label className="font-medium mr-2">Sort by Priority:</label>
-        <select
-          className="border border-gray-300 rounded px-2 py-1"
-          value={sortOrder || ""}
-          onChange={(e) =>
-            setSortOrder(e.target.value as "high" | "medium" | "low" | null)
-          }
-        >
-          <option value="">All</option>
-          <option value="high">High</option>
-          <option value="medium">Medium</option>
-          <option value="low">Low</option>
-        </select>
+      {/* Filters */}
+      <div className="mb-4 flex gap-4">
+        {/* Priority Filter */}
+        <div className="flex items-center">
+          <label className="font-medium mr-2">Priority:</label>
+          <select
+            className="border border-gray-300 rounded px-2 py-1"
+            value={priorityFilter}
+            onChange={(e) => setPriorityFilter(e.target.value as "high" | "medium" | "low" | "all")}
+          >
+            <option value="all">All</option>
+            <option value="High">High</option>
+            <option value="Medium">Medium</option>
+            <option value="Low">Low</option>
+          </select>
+        </div>
+
+        {/* Type Filter */}
+        <div className="flex items-center">
+          <label className="font-medium mr-2">Type:</label>
+          <select
+            className="border border-gray-300 rounded px-2 py-1"
+            value={typeFilter}
+            onChange={(e) => setTypeFilter(e.target.value)}
+          >
+            <option value="all">All</option>
+            <option value="Technical">Technical Issue</option>
+            <option value="General">General</option>
+            <option value="Educational">Educational</option>
+            {/* Add more ticket types as per your data */}
+          </select>
+        </div>
       </div>
 
       {/* Tickets Table */}
@@ -83,76 +121,61 @@ const ResolveTicketPage: React.FC = () => {
         <table className="table-auto w-full border-collapse border border-gray-400">
           <thead>
             <tr className="bg-inherit">
-              <th className="border border-gray-400 px-4 py-2 text-left">
-                Ticket ID
-              </th>
-              <th className="border border-gray-400 px-4 py-2 text-left">
-                Type
-              </th>
-              <th className="border border-gray-400 px-4 py-2 text-left">
-                Date Raised
-              </th>
-              <th className="border border-gray-400 px-4 py-2 text-left">
-                Resolved Date
-              </th>
-              <th className="border border-gray-400 px-4 py-2 text-left">
-                Priority
-              </th>
-              <th className="border border-gray-400 px-4 py-2 text-left">
-                Attachments
-              </th>
-              <th className="border border-gray-400 px-4 py-2 text-left">
-                Action
-              </th>
+              <th className="border border-gray-400 px-4 py-2 text-left">Ticket ID</th>
+              <th className="border border-gray-400 px-4 py-2 text-left">Type</th>
+              <th className="border border-gray-400 px-4 py-2 text-left">Date Raised</th>
+              <th className="border border-gray-400 px-4 py-2 text-left">Resolved Date</th>
+              <th className="border border-gray-400 px-4 py-2 text-left">Priority</th>
+              <th className="border border-gray-400 px-4 py-2 text-left">Attachments</th>
+              <th className="border border-gray-400 px-4 py-2 text-left">Action</th>
             </tr>
           </thead>
           <tbody>
             {tickets.map((ticket) => (
               <tr key={ticket.ticket_id}>
+                <td className="border border-gray-400 px-4 py-2">{ticket.ticket_id}</td>
+                <td className="border border-gray-400 px-4 py-2">{ticket.ticket_type_id}</td>
+                <td className="border border-gray-400 px-4 py-2">{new Date(ticket.created).toLocaleDateString()}</td>
                 <td className="border border-gray-400 px-4 py-2">
-                  {ticket.ticket_id}
+                  {ticket.updated ? new Date(ticket.updated).toLocaleDateString() : "Not Resolved"}
                 </td>
-                <td className="border border-gray-400 px-4 py-2">
-                  {ticket.ticket_type_id}
-                </td>
-                <td className="border border-gray-400 px-4 py-2">
-                  {new Date(ticket.created).toLocaleDateString()}
-                </td>
-                <td className="border border-gray-400 px-4 py-2">
-                  {ticket.updated
-                    ? new Date(ticket.updated).toLocaleDateString()
-                    : "Not Resolved"}
-                </td>
-                <td className="border border-gray-400 px-4 py-2">
-                  {ticket.priority_id}
-                </td>
+                <td className="border border-gray-400 px-4 py-2">{ticket.priority_id}</td>
                 <td className="border border-gray-400 px-4 py-2">
                   {ticket.attachments ? (
-                    <a
-                      href={ticket.attachments}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-blue-500 underline"
-                    >
-                      View Attachment
-                    </a>
+                    <>
+                      <button
+                        className="text-blue-500 underline mr-4"
+                        onClick={() => {
+                          const [ticketId, attachmentName] = ticket.attachments.split('/');
+                          generateSignedUrl(ticketId, attachmentName);
+                        }}
+                      >
+                        View
+                      </button>
+                      {signedUrls[ticket.ticket_id] && (
+                        <button
+                          className="text-green-500 underline"
+                          onClick={() => window.open(signedUrls[ticket.ticket_id], "_blank")}
+                        >
+                          Open Attachment
+                        </button>
+                      )}
+                    </>
                   ) : (
-                    "NULL"
+                    "No Attachment"
                   )}
                 </td>
                 <td className="border border-gray-400 px-4 py-2">
-                <select
-                  className="border border-gray-300 rounded px-2 py-1"
-                  value={ticket.status_id || ""}
-                  onChange={(e) => updateTicketStatus(ticket.ticket_id, e.target.value)}
-                >
-                  <option value="" disabled>
-                    Select Status
-                  </option>
-                  <option value="open">Open</option>
-                  <option value="solving">Solving</option>
-                  <option value="resolved">Resolved</option>
-                </select>
+                  <select
+                    className="border border-gray-300 rounded px-2 py-1"
+                    value={ticket.status_id || ""}
+                    onChange={(e) => updateTicketStatus(ticket.ticket_id, e.target.value)}
+                  >
+                    <option value="" disabled>Select Status</option>
+                    <option value="open">Open</option>
+                    <option value="solving">Solving</option>
+                    <option value="resolved">Resolved</option>
+                  </select>
                 </td>
               </tr>
             ))}

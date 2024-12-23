@@ -125,7 +125,7 @@ const SupportPage: React.FC = () => {
                 Attachments
               </th>
               <th className="border border-gray-400 px-4 py-2 text-left">
-                Date Resolved
+                Status
               </th>
             </tr>
           </thead>
@@ -175,7 +175,7 @@ const SupportPage: React.FC = () => {
                     )}
                   </td>
                   <td className="border border-gray-400 px-4 py-2">
-                    {ticket.updated || "Pending"}
+                    {ticket.status_id}
                   </td>
                 </tr>
               ))
@@ -241,6 +241,7 @@ const CreateTicketPage: React.FC<{ onCancel: () => void }> = ({ onCancel }) => {
       description,
       attachments: attachmentUrl, // Store the full path
       created: new Date().toISOString(),
+      status_id: "open", // Default status set to "open"
     }]);
 
     if (error) {
@@ -265,9 +266,9 @@ const CreateTicketPage: React.FC<{ onCancel: () => void }> = ({ onCancel }) => {
             onChange={(e) => setType(e.target.value)}
             className="w-full px-4 py-2 border border-gray-600 rounded"
           >
-            <option value="Educational Content">Educational Content</option>
-            <option value="Technical Issue">Technical Issue</option>
-            <option value="Other">General</option>
+            <option value="Educational">Educational Content</option>
+            <option value="Technical">Technical Issue</option>
+            <option value="General">General</option>
           </select>
         </div>
         <div className="mb-4">
@@ -301,10 +302,10 @@ const CreateTicketPage: React.FC<{ onCancel: () => void }> = ({ onCancel }) => {
           />
         </div>
         <div className="mb-4">
-          <label className="block text-sm font-bold mb-2">Attachment</label>
+          <label className="block text-sm font-bold mb-2">Attachments</label>
           <input
             type="file"
-            onChange={(e) => e.target.files && setAttachments(e.target.files[0])}
+            onChange={(e) => setAttachments(e.target.files ? e.target.files[0] : null)}
             className="w-full px-4 py-2 border border-gray-600 rounded"
           />
         </div>
@@ -320,7 +321,7 @@ const CreateTicketPage: React.FC<{ onCancel: () => void }> = ({ onCancel }) => {
             type="submit"
             className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
           >
-            Submit
+            Submit Ticket
           </button>
         </div>
       </form>
