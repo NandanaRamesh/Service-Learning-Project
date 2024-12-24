@@ -15,12 +15,11 @@ interface Activities {
 
 const ActivitiesPage: React.FC = () => {
   const router = useRouter();
-  const searchParams = new URLSearchParams(window.location.search);
-  const initialTab = searchParams.get("tab") || "ACT001"; // Default to "crafts"
-  const [selectedCategory, setSelectedCategory] = useState<string>(initialTab);
+  const [selectedCategory, setSelectedCategory] = useState<string>("ACT001"); // Default to "crafts"
   const [searchQuery, setSearchQuery] = useState<string>(""); // Search query state
   const [activities, setActivities] = useState<Activities[]>([]); // All activities fetched from Supabase
   const [filteredActivities, setFilteredActivities] = useState<Activities[]>([]); // Filtered activities based on search and category
+  const [isClient, setIsClient] = useState(false); // State to track if it's client-side rendering
 
   const categories = [
     { label: "Crafts", id: "ACT001" },
@@ -28,6 +27,11 @@ const ActivitiesPage: React.FC = () => {
     { label: "Games", id: "ACT003" },
     { label: "Edutainment", id: "ACT004" },
   ];
+
+  // Set client-side flag after mount
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   // Fetch activities from Supabase based on category
   useEffect(() => {
@@ -71,7 +75,16 @@ const ActivitiesPage: React.FC = () => {
   const handleWatchVideo = (source: string) => {
     router.push(`/Pages/VideoPlayer?pageUrl=${encodeURIComponent(source)}`);
   };
-  
+
+  // Ensure window is available before accessing
+  useEffect(() => {
+    if (isClient) {
+      const searchParams = new URLSearchParams(window.location.search);
+      const initialTab = searchParams.get("tab") || "ACT001"; // Default to "crafts"
+      setSelectedCategory(initialTab);
+    }
+  }, [isClient]);
+
   return (
     <div className="flex min-h-screen">
       {/* Sidebar */}

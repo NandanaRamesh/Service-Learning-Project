@@ -27,9 +27,9 @@ const AdminPage: React.FC = () => {
     type,
   }: {
     message: string;
-    type: string;
+    type: "success" | "error" | "info"; // Define the type here to match the keys of alertStyles
   }) => {
-    const alertStyles = {
+    const alertStyles: { [key in "success" | "error" | "info"]: string } = {
       success: "bg-green-100 text-green-700 border-green-500",
       error: "bg-red-100 text-red-700 border-red-500",
       info: "bg-blue-100 text-blue-700 border-blue-500",

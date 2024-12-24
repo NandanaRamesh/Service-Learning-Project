@@ -141,29 +141,33 @@ const ResolveTicketPage: React.FC = () => {
                 </td>
                 <td className="border border-gray-400 px-4 py-2">{ticket.priority_id}</td>
                 <td className="border border-gray-400 px-4 py-2">
-                  {ticket.attachments ? (
-                    <>
-                      <button
-                        className="text-blue-500 underline mr-4"
-                        onClick={() => {
-                          const [ticketId, attachmentName] = ticket.attachments.split('/');
+                {ticket.attachments && ticket.attachments.trim() !== "" ? (
+                  <>
+                    <button
+                      className="text-blue-500 underline mr-4"
+                      onClick={() => {
+                        // Check if ticket.attachments is not null and contains '/'
+                        const attachmentParts = ticket.attachments?.split('/');
+                        if (Array.isArray(attachmentParts) && attachmentParts.length > 1) {
+                          const [ticketId, attachmentName] = attachmentParts;
                           generateSignedUrl(ticketId, attachmentName);
-                        }}
+                        }
+                      }}
+                    >
+                      View
+                    </button>
+                    {signedUrls[ticket.ticket_id] && (
+                      <button
+                        className="text-green-500 underline"
+                        onClick={() => window.open(signedUrls[ticket.ticket_id], "_blank")}
                       >
-                        View
+                        Open Attachment
                       </button>
-                      {signedUrls[ticket.ticket_id] && (
-                        <button
-                          className="text-green-500 underline"
-                          onClick={() => window.open(signedUrls[ticket.ticket_id], "_blank")}
-                        >
-                          Open Attachment
-                        </button>
-                      )}
-                    </>
-                  ) : (
-                    "No Attachment"
-                  )}
+                    )}
+                  </>
+                ) : (
+                  "No Attachment"
+                )}
                 </td>
                 <td className="border border-gray-400 px-4 py-2">
                   <select

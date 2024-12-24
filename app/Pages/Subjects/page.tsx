@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import { fetchVideosBySubject, searchVideosBySubject, fetchVideosByGrade, searchVideosByGrade } from "@/app/lib/lib/videosSubject";
 import { useSearchParams, useRouter } from "next/navigation";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -82,7 +82,6 @@ const SubjectsPage: React.FC = () => {
   };
 
   const handlePlayVideo = (videoUrl: string) => {
-    // Navigate to the VideoPlayerPage with the video URL as a query parameter
     router.push(`/Pages/VideoPlayer?pageUrl=${encodeURIComponent(videoUrl)}`);
   };
 
@@ -162,12 +161,11 @@ const SubjectsPage: React.FC = () => {
           {videos.length > 0 ? (
             videos.map((video) => (
               <div key={video.video_id} className="p-4 rounded shadow hover:shadow-lg transition">
-                {/* Dynamically generated thumbnail */}
                 <div className="w-full h-32 bg-white flex items-center justify-center rounded">
                   <p className="text-lg font-semibold text-center">{video.title}</p>
                 </div>
                 <button
-                  onClick={() => handlePlayVideo(video.source_url)} // Use the new navigation logic
+                  onClick={() => handlePlayVideo(video.source_url)}
                   className="inline-block mt-2 text-blue-400 hover:text-blue-300 underline flex items-center"
                 >
                   <FontAwesomeIcon icon={faPlay} className="mr-2" /> Watch Video
@@ -183,4 +181,11 @@ const SubjectsPage: React.FC = () => {
   );
 };
 
-export default SubjectsPage;
+// Wrap in Suspense boundary at a higher level if you're using Suspense for async data
+const SubjectsPageWithSuspense: React.FC = () => (
+  <Suspense fallback={<div>Loading...</div>}>
+    <SubjectsPage />
+  </Suspense>
+);
+
+export default SubjectsPageWithSuspense;

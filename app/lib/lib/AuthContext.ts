@@ -1,10 +1,11 @@
-import { createContext, useContext, useEffect, useState } from 'react';
-import { supabase } from './supabaseClient'; // Adjust the path to match your project structure
+/*import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
+import { supabase } from '@/app/lib/lib/supabaseClient'; 
 
-const AuthContext = createContext();
+// Define the context default value type
+const AuthContext = createContext<{ user: any | null }>({ user: null });
 
-export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
+export const AuthProvider = ({ children }: { children: ReactNode }) => {
+  const [user, setUser] = useState<any | null>(null);
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -18,10 +19,20 @@ export const AuthProvider = ({ children }) => {
 
     fetchUser();
 
-    return () => subscription.unsubscribe();
+    // Safely handle the subscription with casting
+    return () => {
+      const sub = subscription as unknown; // Cast to unknown first
+      const unsubscribe = (sub as { unsubscribe: () => void }).unsubscribe;
+      if (unsubscribe) {
+        unsubscribe();
+      }
+    };
   }, []);
 
   return <AuthContext.Provider value={{ user }}>{children}</AuthContext.Provider>;
 };
 
-export const useAuth = () => useContext(AuthContext);
+export const useAuth = () => {
+  return useContext(AuthContext); // Use the correct context here
+};
+*/

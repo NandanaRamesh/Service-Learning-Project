@@ -1,8 +1,9 @@
 "use client";
 
-import React from "react";
+import React, { Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 
+// VideoPlayerPage Component
 const VideoPlayerPage: React.FC = () => {
   const searchParams = useSearchParams();
   const videoUrl = searchParams.get("pageUrl");
@@ -41,4 +42,13 @@ const VideoPlayerPage: React.FC = () => {
   );
 };
 
-export default VideoPlayerPage;
+// Wrapper Component to handle Suspense
+const VideoPlayerWrapper: React.FC = () => {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <VideoPlayerPage />
+    </Suspense>
+  );
+};
+
+export default VideoPlayerWrapper;

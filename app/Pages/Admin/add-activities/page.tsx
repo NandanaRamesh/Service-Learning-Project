@@ -99,9 +99,14 @@ const AddActivities: React.FC = () => {
         description: "",
         activityUrl: "",
       });
-    } catch (error) {
-      console.error("Error during submission:", error);
-      setAlertMessage(error.message || "An error occurred.");
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        console.error("Error during submission:", error);
+        setAlertMessage(error.message || "An error occurred.");
+      } else {
+        console.error("Unexpected error:", error);
+        setAlertMessage("An unexpected error occurred.");
+      }
       setIsError(true);
       setShowAlert(true);
     }

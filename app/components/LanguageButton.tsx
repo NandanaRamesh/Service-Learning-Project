@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import Link from "next-intl/link"; // For handling Next.js locales
+import Link from "next/link"; // For handling Next.js locales
 
 const LanguageButton = () => {
   const [isOpen, setIsOpen] = useState(false);
