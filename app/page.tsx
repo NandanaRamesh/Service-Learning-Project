@@ -1,10 +1,10 @@
-"use client"; // Add this line at the top of the file
+"use client";
 
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/app/lib/lib/supabaseClient";
 import VideoCard from "./components/VideoCard";
-import LoadingSpinner from "./components/LoadingSpinner"; // Import the spinner
+import LoadingSpinner from "./components/LoadingSpinner";
 
 const HomePage: React.FC = () => {
   const [currentPlaying, setCurrentPlaying] = useState<string | null>(null);
@@ -17,44 +17,43 @@ const HomePage: React.FC = () => {
     firstVideo: true,
     secondVideo: true,
   });
+  const [isNeedLoginModalOpen, setIsNeedLoginModalOpen] = useState(false);
   const router = useRouter();
 
   // Fetch video URLs
+  const fetchVideoUrls = async () => {
+    try {
+      setLoading((prev) => ({ ...prev, firstVideo: true }));
+      const { data: firstVideoData, error: firstVideoError } =
+        await supabase.storage
+          .from("VideoCard")
+          .createSignedUrl("VideoCard_Videos/videoCard_videos.mp4", 3600);
+
+      setVideoUrls((prev) => ({
+        ...prev,
+        firstVideo: firstVideoError ? null : firstVideoData?.signedUrl || null,
+      }));
+
+      setLoading((prev) => ({ ...prev, secondVideo: true }));
+      const { data: secondVideoData, error: secondVideoError } =
+        await supabase.storage
+          .from("VideoCard")
+          .createSignedUrl("VideoCard_Videos/videoCard_support.mp4", 3600);
+
+      setVideoUrls((prev) => ({
+        ...prev,
+        secondVideo: secondVideoError
+          ? null
+          : secondVideoData?.signedUrl || null,
+      }));
+    } catch (err) {
+      console.error("Unexpected error:", err);
+    } finally {
+      setLoading((prev) => ({ firstVideo: false, secondVideo: false }));
+    }
+  };
+
   useEffect(() => {
-    const fetchVideoUrls = async () => {
-      try {
-        setLoading((prev) => ({ ...prev, firstVideo: true }));
-        const { data: firstVideoData, error: firstVideoError } =
-          await supabase.storage
-            .from("VideoCard")
-            .createSignedUrl("VideoCard_Videos/videoCard_videos.mp4", 3600);
-
-        setVideoUrls((prev) => ({
-          ...prev,
-          firstVideo: firstVideoError
-            ? null
-            : firstVideoData?.signedUrl || null,
-        }));
-
-        setLoading((prev) => ({ ...prev, secondVideo: true }));
-        const { data: secondVideoData, error: secondVideoError } =
-          await supabase.storage
-            .from("VideoCard")
-            .createSignedUrl("VideoCard_Videos/videoCard_support.mp4", 3600);
-
-        setVideoUrls((prev) => ({
-          ...prev,
-          secondVideo: secondVideoError
-            ? null
-            : secondVideoData?.signedUrl || null,
-        }));
-      } catch (err) {
-        console.error("Unexpected error:", err);
-      } finally {
-        setLoading((prev) => ({ firstVideo: false, secondVideo: false }));
-      }
-    };
-
     fetchVideoUrls();
   }, []);
 
@@ -80,8 +79,7 @@ const HomePage: React.FC = () => {
 
   const requireAuth = (callback: () => void) => {
     if (!user) {
-      alert("You need to log in first!");
-      router.push("/Pages/login");
+      setIsNeedLoginModalOpen(true);
       return;
     }
     callback();
@@ -101,7 +99,7 @@ const HomePage: React.FC = () => {
         <div className="flex flex-col space-y-4 md:space-x-4">
           {loading.firstVideo ? (
             <div className="w-300 h-300 rounded-lg shadow-lg flex justify-center items-center m-5">
-              <LoadingSpinner /> {/* Display loading spinner */}
+              <LoadingSpinner />
             </div>
           ) : videoUrls.firstVideo ? (
             <VideoCard
@@ -113,13 +111,18 @@ const HomePage: React.FC = () => {
               isPlaying={currentPlaying === "video1"}
             />
           ) : (
-            <p>Error loading video. Please try again later.</p>
+            <div>
+              <p>Error loading video. Please try again later.</p>
+              <button onClick={fetchVideoUrls} className="btn btn-secondary">
+                Retry
+              </button>
+            </div>
           )}
         </div>
         <div className="flex flex-col space-y-4">
           {loading.secondVideo ? (
             <div className="w-300 h-300 rounded-lg shadow-lg flex justify-center items-center">
-              <LoadingSpinner /> {/* Display loading spinner */}
+              <LoadingSpinner />
             </div>
           ) : videoUrls.secondVideo ? (
             <VideoCard
@@ -131,10 +134,35 @@ const HomePage: React.FC = () => {
               isPlaying={currentPlaying === "video2"}
             />
           ) : (
-            <p>Error loading video. Please try again later.</p>
+            <div>
+              <p>Error loading video. Please try again later.</p>
+              <button onClick={fetchVideoUrls} className="btn btn-secondary">
+                Retry
+              </button>
+            </div>
           )}
         </div>
       </main>
+      {isNeedLoginModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="w-96 rounded-lg bg-base-100 p-6 shadow-lg">
+            <h2 className="text-lg font-bold">Login</h2>
+            <p className="mt-2 text-gray-400">Login to view the content!</p>
+            <div className="mt-4 flex justify-end space-x-4">
+              <button
+                onClick={() => setIsNeedLoginModalOpen(false)}
+                className="btn">
+                Cancel
+              </button>
+              <button
+                onClick={() => router.push("/Pages/login")}
+                className="btn btn-primary">
+                Login
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
