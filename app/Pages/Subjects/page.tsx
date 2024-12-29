@@ -169,7 +169,7 @@ const SubjectsPage: React.FC = () => {
                 </div>
                 <button
                   onClick={() => handlePlayVideo(video.source_url)}
-                  className="inline-block mt-2 text-blue-400 hover:text-blue-300 underline flex items-center"
+                  className="inline-block mt-2 text-blue-400 hover:text-blue-300 underline items-center"
                 >
                   <FontAwesomeIcon icon={faPlay} className="mr-2" /> Watch Video
                 </button>

@@ -138,7 +138,7 @@ const ActivitiesPage: React.FC = () => {
                 </div>
                 <button
                   onClick={() => handleWatchVideo(activity.source)}
-                  className="inline-block mt-2 text-blue-400 hover:text-blue-300 underline flex items-center"
+                  className="inline-block mt-2 text-blue-400 hover:text-blue-300 underline items-center"
                 >
                   <FontAwesomeIcon icon={faPlay} className="mr-2" /> Watch Video
                 </button>
@@ -152,5 +152,7 @@ const ActivitiesPage: React.FC = () => {
     </div>
   );
 };
+
+//Added new comment
 
 export default ActivitiesPage;
