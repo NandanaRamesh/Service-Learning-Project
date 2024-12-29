@@ -8,13 +8,24 @@ const VideoPlayerPage: React.FC = () => {
   const searchParams = useSearchParams();
   const videoUrl = searchParams.get("pageUrl");
 
-  // Extract the YouTube video ID and create the embed URL
-  const videoIdMatch = videoUrl?.match(/(?:v=|\/embed\/|\/\d+\/|\/vi\/|\/v\/|\/e\/|watch\?v=|&v=|youtu\.be\/)([^#&?]*).*/);
-  const videoId = videoIdMatch ? videoIdMatch[1] : null;
+  // Ensure that videoUrl is not null or undefined before proceeding
+  if (!videoUrl) {
+    return <p className="text-white text-center">Invalid or missing video URL.</p>;
+  }
+
+  // Extract the YouTube video ID for regular videos, Shorts, and Live
+  const videoIdMatch = videoUrl.match(
+    /(?:v=|\/embed\/|\/\d+\/|\/vi\/|\/v\/|\/e\/|watch\?v=|&v=|youtu\.be\/)([^#&?]*)|(?:shorts\/|live\/)([^#?&]*)/
+  );
+
+  // The videoId can be in the first or second capturing group, depending on the type of URL
+  const videoId = videoIdMatch ? videoIdMatch[1] || videoIdMatch[2] : null;
+
+  // Create the embed URL based on the type of video (regular, shorts, or live)
   const embedUrl = videoId ? `https://www.youtube.com/embed/${videoId}` : null;
 
   if (!embedUrl) {
-    return <p className="text-white text-center">Invalid or missing video URL.</p>;
+    return <p className="text-white text-center">Invalid or unsupported video URL.</p>;
   }
 
   return (
