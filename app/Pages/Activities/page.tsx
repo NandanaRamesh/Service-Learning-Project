@@ -133,8 +133,11 @@ const ActivitiesPage: React.FC = () => {
                 <div className="w-full h-32 bg-white flex items-center justify-center rounded">
                   <p className="text-lg font-semibold text-center">{activity.activity_name}</p>
                 </div>
+                <div className="mt-2 h-16 overflow-y-auto text-sm text-inherit bg-inherit p-2 rounded">
+                  {activity.description}
+                </div>
                 <button
-                  onClick={() => handleWatchVideo(activity.source)} // Use the new navigation logic
+                  onClick={() => handleWatchVideo(activity.source)}
                   className="inline-block mt-2 text-blue-400 hover:text-blue-300 underline flex items-center"
                 >
                   <FontAwesomeIcon icon={faPlay} className="mr-2" /> Watch Video

@@ -164,6 +164,9 @@ const SubjectsPage: React.FC = () => {
                 <div className="w-full h-32 bg-white flex items-center justify-center rounded">
                   <p className="text-lg font-semibold text-center">{video.title}</p>
                 </div>
+                <div className="mt-2 h-16 overflow-y-auto text-sm text-inherit bg-inherit p-2 rounded">
+                  {video.description}
+                </div>
                 <button
                   onClick={() => handlePlayVideo(video.source_url)}
                   className="inline-block mt-2 text-blue-400 hover:text-blue-300 underline flex items-center"
