@@ -6,8 +6,6 @@ import { supabase } from "@/app/lib/lib/supabaseClient";
 import VideoCard from "./components/VideoCard";
 import LoadingSpinner from "./components/LoadingSpinner";
 
-//new commit change
-
 const HomePage: React.FC = () => {
   const [currentPlaying, setCurrentPlaying] = useState<string | null>(null);
   const [user, setUser] = useState<any>(null);
