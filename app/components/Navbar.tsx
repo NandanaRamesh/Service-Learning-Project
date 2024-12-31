@@ -139,8 +139,7 @@ const Navbar: React.FC<NavbarProps> = ({ setIsAuthenticated }) => {
   };
 
   const navigateHome = () => {
-    const cleanUrl = "/";
-    router.push(cleanUrl);
+    window.location.href = "/";
   };
 
   return (
@@ -188,9 +187,9 @@ const Navbar: React.FC<NavbarProps> = ({ setIsAuthenticated }) => {
             )}
           </ul>
         </div>
-        <Link href="/" className="btn btn-ghost text-xl">
+        <button onClick={navigateHome} className="m-3 font-bold text-xl">
           SVSST
-        </Link>
+        </button>
       </div>
 
       <div className="navbar-center hidden lg:flex">
