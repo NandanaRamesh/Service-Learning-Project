@@ -82,7 +82,9 @@ const SubjectsPage: React.FC = () => {
   };
 
   const handlePlayVideo = (videoUrl: string) => {
-    router.push(`/Pages/VideoPlayer?pageUrl=${encodeURIComponent(videoUrl)}`);
+    window.location.href = `/Pages/VideoPlayer?pageUrl=${encodeURIComponent(
+      videoUrl
+    )}`;
   };
 
   return (
