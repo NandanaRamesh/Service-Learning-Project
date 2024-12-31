@@ -73,7 +73,9 @@ const ActivitiesPage: React.FC = () => {
 
   // Handle redirection to VideoPlayer page
   const handleWatchVideo = (source: string) => {
-    router.push(`/Pages/VideoPlayer?pageUrl=${encodeURIComponent(source)}`);
+    window.location.href = `/Pages/VideoPlayer?pageUrl=${encodeURIComponent(
+      source
+    )}`;
   };
 
   // Ensure window is available before accessing
