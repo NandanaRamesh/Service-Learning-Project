@@ -138,6 +138,11 @@ const Navbar: React.FC<NavbarProps> = ({ setIsAuthenticated }) => {
     setIsProfileOpen((prev) => !prev);
   };
 
+  const navigateHome = () => {
+    const cleanUrl = "/";
+    router.push(cleanUrl);
+  };
+
   return (
     <div className="navbar bg-base-100" ref={navbarRef}>
       <div className="navbar-start">
@@ -161,7 +166,7 @@ const Navbar: React.FC<NavbarProps> = ({ setIsAuthenticated }) => {
             tabIndex={0}
             className="menu menu-sm dropdown-content bg-base-100 rounded-box z-[60] mt-3 w-52 p-2 shadow">
             <li>
-              <Link href="/">Home</Link>
+              <button onClick={navigateHome}>Home</button>
             </li>
             {user && (
               <>
@@ -191,7 +196,7 @@ const Navbar: React.FC<NavbarProps> = ({ setIsAuthenticated }) => {
       <div className="navbar-center hidden lg:flex">
         <ul className="menu menu-horizontal px-1 space-x-4">
           <li>
-            <Link href="/">Home</Link>
+            <button onClick={navigateHome}>Home</button>
           </li>
           {user && (
             <>
