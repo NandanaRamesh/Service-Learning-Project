@@ -131,7 +131,7 @@ const Navbar: React.FC<NavbarProps> = ({ setIsAuthenticated }) => {
   const handleLogout = async () => {
     await supabase.auth.signOut();
     setIsLogoutModalOpen(false); // Close modal after logout
-    router.push("/");
+    window.location.href = "/";
   };
 
   const toggleProfileDropdown = () => {
