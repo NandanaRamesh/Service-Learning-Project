@@ -37,6 +37,7 @@ const SubjectsPage: React.FC = () => {
     { label: "Chemistry", id: "S0005" },
     { label: "Biology", id: "S0006" },
     { label: "GS & ES", id: "S0007" },
+    { label: "Hindi", id: "S0008"},
   ];
 
   const grades = [

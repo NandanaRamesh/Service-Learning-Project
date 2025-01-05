@@ -44,6 +44,7 @@ const AddActivities: React.FC = () => {
       Arts: "ACT002",
       Games: "ACT003",
       Edutainment: "ACT004",
+      Songs: "ACT005",
     };
 
     const activityTypeId = activityTypeMap[activityType];
@@ -136,6 +137,7 @@ const AddActivities: React.FC = () => {
             <option value="Crafts">Crafts</option>
             <option value="Games">Games</option>
             <option value="Edutainment">Edutainment</option>
+            <option value="Songs">Songs</option>
           </select>
         </div>
 

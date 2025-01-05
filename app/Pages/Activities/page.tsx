@@ -26,6 +26,7 @@ const ActivitiesPage: React.FC = () => {
     { label: "Arts", id: "ACT002" },
     { label: "Games", id: "ACT003" },
     { label: "Edutainment", id: "ACT004" },
+    { label: "Songs", id: "ACT005"},
   ];
 
   // Set client-side flag after mount

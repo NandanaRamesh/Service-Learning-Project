@@ -66,6 +66,7 @@ const AddVideos: React.FC = () => {
         Chemistry: "S0005",
         Biology: "S0006",
         "GS & ES": "S0007",
+        Hindi: "S0008",
       };
 
       const gradeCodes: { [key: string]: string } = {
