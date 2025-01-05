@@ -27,6 +27,8 @@ const ActivitiesPage: React.FC = () => {
     { label: "Games", id: "ACT003" },
     { label: "Edutainment", id: "ACT004" },
     { label: "Songs", id: "ACT005"},
+    { label: "Information", id: "ACT006"},
+    { label: "Resources", id: "ACT007"},
   ];
 
   // Set client-side flag after mount
@@ -72,12 +74,20 @@ const ActivitiesPage: React.FC = () => {
     router.push(`/Pages/Activities?tab=${categoryId}`);
   };
 
-  // Handle redirection to VideoPlayer page
-  const handleWatchVideo = (source: string) => {
-    window.location.href = `/Pages/VideoPlayer?pageUrl=${encodeURIComponent(
-      source
-    )}`;
-  };
+    // Handle redirection for different activity types
+    const handleOpenActivity = (activity: Activities) => {
+      if (selectedCategory === "ACT007") {
+        // Redirect to EmbedPlayer for Resources
+        router.push(
+          `/Pages/EmbedPlayer?embedCode=${encodeURIComponent(activity.source)}`
+        );
+      } else {
+        // Redirect to VideoPlayer for other types
+        router.push(
+          `/Pages/VideoPlayer?pageUrl=${encodeURIComponent(activity.source)}`
+        );
+      }
+    };
 
   // Ensure window is available before accessing
   useEffect(() => {
@@ -132,18 +142,24 @@ const ActivitiesPage: React.FC = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {filteredActivities.length > 0 ? (
             filteredActivities.map((activity) => (
-              <div key={activity.activity_id} className="p-4 rounded shadow hover:shadow-lg transition">
+              <div
+                key={activity.activity_id}
+                className="p-4 rounded shadow hover:shadow-lg transition"
+              >
                 <div className="w-full h-32 bg-white flex items-center justify-center rounded">
-                  <p className="text-lg font-semibold text-center">{activity.activity_name}</p>
+                  <p className="text-lg font-semibold text-center">
+                    {activity.activity_name}
+                  </p>
                 </div>
                 <div className="mt-2 h-16 overflow-y-auto text-sm text-inherit bg-inherit p-2 rounded">
                   {activity.description}
                 </div>
                 <button
-                  onClick={() => handleWatchVideo(activity.source)}
+                  onClick={() => handleOpenActivity(activity)}
                   className="inline-block mt-2 text-blue-400 hover:text-blue-300 underline items-center"
                 >
-                  <FontAwesomeIcon icon={faPlay} className="mr-2" /> Watch Video
+                  <FontAwesomeIcon icon={faPlay} className="mr-2" />
+                  {selectedCategory === "ACT007" ? "Read Book" : "Watch Video"}
                 </button>
               </div>
             ))

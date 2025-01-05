@@ -45,6 +45,8 @@ const AddActivities: React.FC = () => {
       Games: "ACT003",
       Edutainment: "ACT004",
       Songs: "ACT005",
+      Information: "ACT006", 
+      Resources: "ACT007",
     };
 
     const activityTypeId = activityTypeMap[activityType];
@@ -138,6 +140,8 @@ const AddActivities: React.FC = () => {
             <option value="Games">Games</option>
             <option value="Edutainment">Edutainment</option>
             <option value="Songs">Songs</option>
+            <option value="Information">Information</option>
+            <option value="Resources">Resources</option>
           </select>
         </div>
 
@@ -170,18 +174,23 @@ const AddActivities: React.FC = () => {
 
         {/* Activity Source */}
         <div>
-          <label className="block font-semibold mb-2">Activity URL</label>
+          <label className="block font-semibold mb-2">
+            {formData.activityType === "Resources" ? "Iframe Embedding" : "Activity URL"}
+          </label>
           <input
-            type="url"
+            type="text" // Use text to accept both URLs and iframe embeddings
             name="activityUrl"
-            placeholder="Enter activity URL"
+            placeholder={
+              formData.activityType === "Resources"
+                ? "Enter iframe embedding"
+                : "Enter activity URL"
+            }
             value={formData.activityUrl}
             onChange={handleChange}
             className="w-full p-2 border rounded"
             required
           />
         </div>
-
         {/* Submit Button */}
         <button
           type="submit"
