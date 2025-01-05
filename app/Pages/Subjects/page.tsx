@@ -47,27 +47,44 @@ const SubjectsPage: React.FC = () => {
 
   useEffect(() => {
     const fetchData = async () => {
+      let fetchedVideos: Video[] = [];
+  
       if (filterType === "subject") {
         if (searchQuery) {
-          const searchResults = await searchVideosBySubject(selectedSubject, searchQuery);
-          setVideos(searchResults);
+          fetchedVideos = await searchVideosBySubject(selectedSubject, searchQuery);
         } else {
-          const videosBySubject = await fetchVideosBySubject(selectedSubject);
-          setVideos(videosBySubject);
+          fetchedVideos = await fetchVideosBySubject(selectedSubject);
         }
       } else if (filterType === "grade") {
         if (searchQuery) {
-          const searchResults = await searchVideosByGrade(selectedGrade, searchQuery);
-          setVideos(searchResults);
+          fetchedVideos = await searchVideosByGrade(selectedGrade, searchQuery);
         } else {
-          const videosByGrade = await fetchVideosByGrade(selectedGrade);
-          setVideos(videosByGrade);
+          fetchedVideos = await fetchVideosByGrade(selectedGrade);
         }
       }
+  
+      // Sort videos based on numeric prefix
+      fetchedVideos.sort((a, b) => {
+        const extractPrefixNumber = (title: string) => {
+          const match = title.match(/^(\d+)\./); // Extract the numeric prefix before "."
+          return match ? parseInt(match[1], 10) : Number.MAX_SAFE_INTEGER; // Default large number if no prefix
+        };
+  
+        const numA = extractPrefixNumber(a.title);
+        const numB = extractPrefixNumber(b.title);
+  
+        if (numA !== numB) {
+          return numA - numB; // Compare numeric prefixes
+        }
+        return a.title.localeCompare(b.title); // Fallback to alphabetical order
+      });
+  
+      setVideos(fetchedVideos);
     };
-
+  
     fetchData();
   }, [selectedSubject, selectedGrade, searchQuery, filterType]);
+    
 
   const handleSubjectChange = (subjectId: string) => {
     setSelectedSubject(subjectId);
