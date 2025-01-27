@@ -6,13 +6,11 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlay } from '@fortawesome/free-solid-svg-icons';
 import { supabase } from "@/app/lib/lib/supabaseClient"; // Adjust according to your supabase client import
 
-//updating changes on activities
-
 interface Activities {
   activity_id: string;
   activity_name: string;
   description: string;
-  source: string; // URL for the activity source
+  source: string;
 }
 
 const ActivitiesPage: React.FC = () => {
@@ -81,11 +79,11 @@ const ActivitiesPage: React.FC = () => {
       if (selectedCategory === "ACT007") {
         // Redirect to EmbedPlayer for Resources
         router.push(
-          `/Pages/EmbedPlayer?embedCode=${encodeURIComponent(activity.source)}`
+          window.location.href =`/Pages/EmbedPlayer?embedCode=${encodeURIComponent(activity.source)}`
         );
       } else {
         // Redirect to VideoPlayer for other types
-        window.location.href = `/Pages/VideoPlayer?pageUrl=${encodeURIComponent(source)}`;
+        window.location.href = `/Pages/VideoPlayer?pageUrl=${encodeURIComponent(activity.source)}`;
       }
     };
 
