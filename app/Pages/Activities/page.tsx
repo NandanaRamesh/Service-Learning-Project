@@ -6,6 +6,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlay } from '@fortawesome/free-solid-svg-icons';
 import { supabase } from "@/app/lib/lib/supabaseClient"; // Adjust according to your supabase client import
 
+//updating changes on activities
+
 interface Activities {
   activity_id: string;
   activity_name: string;
