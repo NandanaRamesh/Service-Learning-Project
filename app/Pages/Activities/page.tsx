@@ -83,9 +83,7 @@ const ActivitiesPage: React.FC = () => {
         );
       } else {
         // Redirect to VideoPlayer for other types
-        router.push(
-          `/Pages/VideoPlayer?pageUrl=${encodeURIComponent(activity.source)}`
-        );
+        window.location.href = `/Pages/VideoPlayer?pageUrl=${encodeURIComponent(source)}`;
       }
     };
 
